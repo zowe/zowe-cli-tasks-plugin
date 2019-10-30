@@ -28,7 +28,6 @@ import Tasks from "./Tasks";
 import { INamedTask } from "./interface/task/INamedTask";
 import { IValidator } from "./interface/config/IValidator";
 import { exec } from "child_process";
-import { join } from "path";
 import Utils from "./Utils";
 import { IScript } from "./interface/script/IScript";
 import * as path from "path";
@@ -38,7 +37,7 @@ export default class Action extends BaseRunner {
     public static async run(params: IRunAction) {
         const action: Action = new Action(params);
         BaseRunner.FileSequenceIndex++;
-        action.logDir = join(action.logDir, "action_sequence_" + BaseRunner.FileSequenceIndex + "_" + action.name);
+        action.logDir = path.join(action.logDir, "action_sequence_" + BaseRunner.FileSequenceIndex + "_" + action.name);
         if (action.extractedOutput == null) {
             action.extractedOutput = {};
         }
