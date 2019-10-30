@@ -1,0 +1,17 @@
+node_modules/
+lib/
+.vscode
+.idea
+results/
+__results__/
+__tests__/__results__/
+/__tests__/__resources__/properties/**
+!/__tests__/__resources__/properties/example_properties.yaml
+*.iml
+zowe-tasks.private.yml
+zowe-tasks-user.yml
+teststuff/
+zowe-tasks-out/
+failed_job_output/
+rendered/
+iplvol.txt

@@ -1,0 +1,540 @@
+#------------------------------------------------------------------------------#
+# Input controls where/how user input is gathered for the tasks.               #
+#                                                                              #
+# Under "input:" you specify the input variable name and an array of "sources" #
+# that will be searched in the order they appear in the array for the input    #
+# values.                                                                      #
+#                                                                              #
+# "user"   - extract from the user config file (e.g. zowe-tasks-user.yml)      #
+# "env"    - extract from "ZOWE_TASKS_<varname>" env variable                  #
+# "prompt" - extract from interactive terminal prompt                          #
+#                                                                              #
+# Once a value has been located, no other sources are searched. You can use    #
+# the extracted variables throughout the config file with ${varname}.          #
+#------------------------------------------------------------------------------#
+input: 
+  zosmfHost: 
+    desc: "Hostname for z/OSMF instance -"
+    sources:
+      - user
+      - env
+      - prompt 
+  zosmfPort: 
+    desc: "The port for your z/OSMF instance -"
+    sources:
+      - user
+      - env
+      - prompt 
+  tsoUserID: 
+    desc: "Your TSO user ID (valid for z/OSMF) -"
+    sources:
+      - user
+      - env
+      - prompt 
+  tsoPassword: 
+    desc: "Your TSO password (valid for z/OSMF) -"
+    mask: true
+    sources: 
+      - user
+      - env
+      - prompt  
+  ussDirectory:
+    desc: "A USS directory where files can be uploaded -"
+    sources:
+      - user
+      - env
+      - prompt  
+
+#------------------------------------------------------------------------------#
+# Global lets you set variables that are global and static for your tasks.     #
+# You can use ${varname} throughout the config file to use these variables.    #
+#------------------------------------------------------------------------------#
+global: 
+  rexxPath: ./samples/example.rexx
+
+#------------------------------------------------------------------------------#
+# Args can be used on the "mergeArgs" array. Args can be used to specify sets  #
+# of arguments that are required on Zowe CLI commands. Instead of specifying   #
+# each argument by name, you can use "mergeArgs" to merge the arguments for    #
+# the action with a set of arguments defined here. Example:                    #
+#                                                                              # 
+#   ...                                                                        #
+#   action:                                                                    # 
+#     type: "cmd"                                                              #
+#     run: "jobs submit lf"                                                    #
+#   mergeArgs:                                                                 #
+#     - zosmfArgs                                                              #
+#   args:                                                                      #
+#      localFile: rendered/iefbr14.jcl                                         # 
+#   ...                                                                        #
+#                                                                              #
+#------------------------------------------------------------------------------#
+args:
+  zosmfArgs:
+    host: ${zosmfHost}
+    port: ${zosmfPort}
+    user: ${tsoUserID}
+    password: ${tsoPassword}
+    rejectUnauthorized: false
+  hostSSH: 
+    port: 22
+
+#------------------------------------------------------------------------------#
+# Start of Tasks list - If "zowe tasks run" is issued without a task name,     # 
+# these tasks will run in the order they appear under "tasks" property.        # 
+#------------------------------------------------------------------------------#
+tasks: 
+
+  #----------------------------------------------------------------------------#
+  # Task: render-job-file                                                      #
+  #                                                                            #
+  #       1. Renders a template from a file and saves it to a file             #
+  #       2. Rendered template is read and submitted for execution             # 
+  #       3. Waits for the job to complete                                     # 
+  #       4. Verifies the job completed with CC 0000                           #
+  #       5. Validate that the job output contains the comment                 #
+  #       6. Deletes the output from spool                                     # 
+  #                                                                            # 
+  #----------------------------------------------------------------------------#
+  render-job-file:
+    desc: "Render a job and submit the job"
+    actions:
+      - name: "renderIefbr14Job"
+        desc: "Render IEFBR14 job"
+        action:
+          type: "func"
+          run: "renderTemplate"
+        args:
+          templatePath: templates/iefbr14.jcl
+          renderedPath: rendered/iefbr14.jcl
+          data: 
+            jobname: ${tsoUserID}I
+            account: ${accountInfo}
+      - name: "submitIefbr14Job"
+        desc: "Submit the rendered IEFBR14"
+        action:
+          type: "cmd"
+          run: "jobs submit lf"
+        mergeArgs:
+          - zosmfArgs
+        args:
+          localFile: rendered/iefbr14.jcl
+        jsonExtractor: 
+          jobid: "$.data.jobid"
+          jobname: "$.data.jobname"
+      - "waitForStatus"
+      - "validateJobCC"
+      - "deleteJobOutput"
+  #----------------------------------------------------------------------------#
+  # Task: render-job-inline                                                    #
+  #                                                                            #
+  #       1. Renders a template from a file and passes it on through a var     #
+  #       2. Rendered template is submitted for execution                      # 
+  #       3. Waits for the job to complete                                     # 
+  #       4. Verifies the job completed with CC 0000                           #
+  #       5. Validate that the job output contains the comment                 #
+  #       6. Deletes the output from spool                                     # 
+  #                                                                            # 
+  #----------------------------------------------------------------------------#
+  render-job-inline:
+    desc: "Render a job and submit the job"
+    actions:
+      - name: "renderIefbr14Job"
+        desc: "Render IEFBR14 job"
+        action: 
+          type: "func"
+          run: "renderTemplate"
+        outputExtractor:
+          - var: "iefbr14JCL"
+        args:
+          templatePath: templates/iefbr14.jcl
+          data: 
+            jobname: ${tsoUserID}I
+            account: ${accountInfo}
+      - name: "submitIefbr14Job"
+        desc: "Submit the rendered IEFBR14"
+        action: 
+          type: "func"
+          run: "submitJob"
+        mergeArgs:
+          - zosmfArgs
+        args:
+          jcl: ${extracted.iefbr14JCL}
+        jsonExtractor: 
+          jobid: "$.jobid"
+          jobname: "$.jobname"
+      - "waitForStatus"
+      - "validateJobCC"
+      - "deleteJobOutput"
+  #----------------------------------------------------------------------------#
+  # Task: render-job-inline                                                    #
+  #                                                                            #
+  #       1. Simple script creates a date/time comment                         #
+  #       2. Comment is rendered into a job template                           #
+  #       3. Template is submitted for execution                               # 
+  #       4. Waits for the job to complete                                     # 
+  #       5. Verifies the job completed with CC 0000                           #
+  #       6. Validate that the job output contains the comment                 #
+  #       7. Deletes the output from spool                                     # 
+  #                                                                            # 
+  #----------------------------------------------------------------------------#
+  render-job-inline-comment:
+    desc: "Render a job and submit with date/time stamp"
+    actions:
+      - name: "getDateTimeStamp"
+        desc: "Get a date time stamp"
+        action:
+          type: "js"
+          run: >
+            var date = new Date();
+            return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}_time_${date.getHours()}-${date.getMinutes()}-${date.getSeconds()}_${date.getMilliseconds()}ms`;
+        outputExtractor:
+          - var: "dateTimeStamp"
+      - name: "renderIefbr14Job"
+        desc: "Render IEFBR14 job"
+        action: 
+          type: "func"
+          run: "renderTemplate"
+        outputExtractor:
+          - var: "iefbr14JCL"
+        args:
+          templatePath: templates/iefbr14.jcl
+          data: 
+            jobname: ${tsoUserID}I
+            account: ${accountInfo}
+            comment: ${extracted.dateTimeStamp}
+      - name: "submitIefbr14Job"
+        desc: "Submit the rendered IEFBR14"
+        action: 
+          type: "func"
+          run: "submitJob"
+        jsonExtractor: 
+          jobid: "$.jobid"
+          jobname: "$.jobname"
+        mergeArgs:
+          - zosmfArgs
+        args:
+          jcl: ${extracted.iefbr14JCL}
+      - "waitForStatus"
+      - "validateJobCC"
+      - name: "validateCommentOutput"
+        desc: "Validate ${extracted.jobname}(${extracted.jobid}) JCL contains date/time stamp"
+        action:
+          type: "cmd"
+          run: "jobs view sfbi"
+        mergeArgs:
+          - zosmfArgs
+        args:
+          jobid: ${extracted.jobid}
+          spoolfileid: 3
+        validator:
+          - exp: "match(output, /${extracted.dateTimeStamp}/g)"
+            onFailure: 
+              - "download-failed-job"
+      - "deleteJobOutput"
+
+  #----------------------------------------------------------------------------#
+  # Task: ssh-example                                                          #
+  #                                                                            #
+  #       1. Creates a directory on USS using "mkdir -p" shell command         #
+  #       2. Uploads files to the directory                                    #
+  #       3. Changes the permissions to 755 with "chmod" shell command         # 
+  #       4. Issues an invalid shell command, but continues (successOnFail)    # 
+  #       5. Issues a simple "ls -la" shell command to verify it continued     #
+  #                                                                            # 
+  #----------------------------------------------------------------------------#
+  ssh-example:
+    desc: "Create a directory and upload files"
+    actions:
+      - name: "createAUSSDirectory"
+        desc: "Create USS directory ${ussDirectory}"
+        onSuccessMsg: "The project directory ${ussDirectory} was created"
+        action:
+          type: "cmd"
+          run: "uss issue ssh"
+        mergeArgs:
+          - hostSSH
+          - zosmfArgs
+        args: 
+          command: "mkdir -p ${ussDirectory}"
+      - name: "uploadFilesToUSS"
+        desc: "Upload files to ${ussDirectory}"
+        action: 
+          type: "func"
+          run: "uploadDirToUSS"
+        mergeArgs:
+          - zosmfArgs
+        args:
+          source: ./upload
+          dest: ${ussDirectory}
+      - name: "chmodTheDirectory"
+        desc: "chmod 755 ${ussDirectory}"
+        action:
+          type: "cmd"
+          run: "uss issue ssh"
+        mergeArgs:
+          - hostSSH
+          - zosmfArgs
+        args: 
+          command: "chmod -R 755 ${ussDirectory}"
+      - name: "issueANonExistentCommand"
+        desc: "Issue a command that doesn't exist and succeed"
+        successOnFail: true
+        onError: "ssh-error"
+        action:
+          type: "cmd"
+          run: "uss issue ssh"
+        mergeArgs:
+          - hostSSH
+          - zosmfArgs
+        args: 
+          command: "thiscommandisinvalid"
+      - name: "commandAfterSuccessOnFail"
+        desc: "Issue a command after success on Fail"
+        action:
+          type: "cmd"
+          run: "uss issue ssh"
+        mergeArgs:
+          - hostSSH
+          - zosmfArgs
+        args: 
+          command: "ls -la"
+
+  #----------------------------------------------------------------------------#
+  # Task: exec-rexx                                                            #
+  #                                                                            #
+  #       1. Issues a local host command "cat" to get the contents of a file   #
+  #          (which are a REXX exec)                                           #
+  #       2. Renders the REXX exec into a JOB that submits inline REXX         #
+  #       4. Waits for the job to complete                                     # 
+  #       5. Verifies the job completed with CC 0000                           #
+  #       6. Validates that the job outputted the "say" statements             #
+  #       7. Deletes the output from spool                                     # 
+  #                                                                            # 
+  #----------------------------------------------------------------------------#
+  exec-rexx:
+    desc: "Run an inline REXX program in batch"
+    actions:
+      - name: "catREXXProgram"
+        desc: "Get the REXX program to include in the JOB"
+        action:
+          type: "exec"
+          run: "cat ${rexxPath}"
+        jsonExtractor:
+          rexxPgm: "$.stdout"
+      - name: "renderREXXJob" 
+        desc: "Render REXX job"
+        action: 
+          type: "func"
+          run: "renderTemplate"
+        outputExtractor:
+          - var: "rexxJCL"
+        args:
+          templatePath: templates/inlineREXX.jcl
+          data: 
+            rexxexec: ${extracted.rexxPgm}
+            jobname: ${tsoUserID}R
+            account: ${accountInfo}
+      - name: "submitREXXJob"
+        desc: "Submit the rendered REXX Job"
+        action: 
+          type: "func"
+          run: "submitJob"
+        jsonExtractor: 
+          jobid: "$.jobid"
+          jobname: "$.jobname"
+        mergeArgs:
+          - zosmfArgs
+        args:
+          jcl: ${extracted.rexxJCL}     
+      - "waitForStatus"
+      - "validateJobCC"
+      - name: "validateREXXOutput"
+        desc: "Validate that the output of the rexx is OK"
+        action:
+          type: "cmd"
+          run: "jobs view sfbi"
+        mergeArgs:
+          - zosmfArgs
+        args:
+          jobid: ${extracted.jobid}
+          spoolfileid: 103
+        validator:
+          - exp: "match(output, /Hello, World!/g)"
+            onFailure: 
+              - "download-failed-job"
+      - "deleteJobOutput" 
+  #----------------------------------------------------------------------------#
+  # Task: get-ipl-volume                                                       #
+  #                                                                            #
+  #       1. Issues an MVS "D IPLINFO" command                                 #
+  #       2. Runs a script to extract the IPL volume                           #
+  #       3. Write to a text file                                              #
+  #                                                                            # 
+  #----------------------------------------------------------------------------#
+  get-ipl-volume:
+    desc: "Extract the IPL volume"
+    actions:
+      #------------------------------------------------------------------------#
+      # Action: Issue D IPLINFO and extract response                           #
+      #------------------------------------------------------------------------#
+      - name: "issueDIPLINFO"
+        desc: "Issue MVS console command D IPLINFO"
+        action:
+          type: "cmd"
+          run: "console issue cmd"
+        mergeArgs:
+          - zosmfArgs
+        jsonExtractor:
+          iplInfo: "$.data.commandResponse"
+        args:
+          commandtext: "D IPLINFO"
+      #------------------------------------------------------------------------#
+      # Action: Extract just the IPL volume from the response                  #
+      #------------------------------------------------------------------------#
+      - name: "extractTheIPLVol"
+        desc: "Extract the IPL volume"
+        action:
+          type: "script"
+          run: "./scripts/GetIPLVol"
+        outputExtractor:
+          - var: "iplVol"
+        args:
+          dIPLOutput: ${extracted.iplInfo}
+      #------------------------------------------------------------------------#
+      # Action: Write it to a file                                             #
+      #------------------------------------------------------------------------#
+      - name: "writeIPLVolToFile"
+        desc: "Write the IPL volume to a file"
+        action:
+          type: "js"
+          run: >
+            let fs = require("fs");
+            fs.writeFileSync("iplvol.txt", iplVol);
+        args:
+          iplVol: ${extracted.iplVol}
+#------------------------------------------------------------------------------#
+# Helpers consist of "out of the task stream" actions and tasks. These can be  #
+# referenced as reusable tasks/actions throughout your "tasks" stream. You can #
+# also run the tasks directly by specifying their name on the "run" command.   #
+#------------------------------------------------------------------------------#
+helpers: 
+
+  #----------------------------------------------------------------------------#
+  # Helper Actions                                                             #
+  #----------------------------------------------------------------------------#
+  actions:
+    - name: "waitForStatus"
+      desc: "Wait for JOB ${extracted.jobname}(${extracted.jobid}) status to be OUTPUT"
+      action:
+        type: "func"
+        run: "waitForJobStatus"
+      mergeArgs:
+        - zosmfArgs
+      args: 
+        jobid: ${extracted.jobid}
+        jobname: ${extracted.jobname}
+        status: "OUTPUT"
+        # watchDelay: number
+        # attempts: number
+    - name: "validateJobCC"
+      desc: "Ensure that job ${extracted.jobname}(${extracted.jobid}) completed successfully"
+      action:
+        type: "cmd"
+        run: "jobs view jsbj"
+      validators: 
+        - exp: "output.data.retcode === 'CC 0000'"
+          onFailure: 
+            - "download-failed-job"
+      mergeArgs:
+        - zosmfArgs
+      args:
+        jobid: ${extracted.jobid}    
+    - name: "deleteJobOutput"
+      desc: "Delete the output of ${extracted.jobname}(${extracted.jobid})"
+      action:
+        type: "cmd"
+        run: "jobs delete job"
+      mergeArgs:
+        - zosmfArgs
+      args:
+        jobid: ${extracted.jobid}
+    - name: "waitForJobToComplete"
+      desc: "Wait for ${extracted.jobname}(${extracted.jobid}) to complete"
+      action:
+        type: "func"
+        run: "waitForJobStatus"
+      mergeArgs:
+        - zosmfArgs
+      args: 
+        jobid: ${extracted.jobid}
+        jobname: ${extracted.jobname}
+        status: "OUTPUT"
+
+  #----------------------------------------------------------------------------#
+  # Helper Tasks                                                               #
+  #----------------------------------------------------------------------------#
+  tasks:
+    #--------------------------------------------------------------------------#
+    # Task: download-failed-job                                                #
+    #                                                                          #
+    #       If a job fails, this task is invoked to download the job output    # 
+    #       for review on the local filesystem.                                #
+    #                                                                          #
+    #--------------------------------------------------------------------------#
+    download-failed-job: 
+      desc: "Download the failed job"
+      actions: 
+        - name: "downloadFailedJob"
+          desc: "Download the failed job"
+          action:
+            type: "cmd"
+            run: "jobs download output"
+          onSuccessMsg: "Output directory: failed_job_output/${extracted.jobid}"
+          mergeArgs:
+            - zosmfArgs
+          args:
+            jobid: ${extracted.jobid}
+            directory: failed_job_output
+    #--------------------------------------------------------------------------#
+    # Task: ssh-error                                                          #
+    #                                                                          #
+    #       Causes an SSH error, but continues with "successOnTrue"            #
+    #                                                                          #
+    #--------------------------------------------------------------------------#
+    ssh-error: 
+      desc: "Another SSH error"
+      actions: 
+        - name: "anotherSSHError"
+          desc: "Cause another SSH error"
+          successOnFail: true
+          onError: ssh-echo
+          action:
+            type: "cmd"
+            run: "uss issue ssh"
+          mergeArgs:
+            - hostSSH
+            - zosmfArgs
+          args:
+            command: "thiscommanddoesnotexist"
+    #--------------------------------------------------------------------------#
+    # Task: ssh-echo                                                           #
+    #                                                                          #
+    #       Simple ssh echo of "Hello World"                                   #
+    #                                                                          #
+    #--------------------------------------------------------------------------#
+    ssh-echo:
+      desc: "Simple SSH echo command"
+      actions: 
+        - name: "doASimpleEcho"
+          desc: "Simple Echo Hello World!"
+          onSuccessMsg: "It worked!"
+          action:
+            type: "cmd"
+            run: "uss issue ssh"
+          mergeArgs:
+            - hostSSH
+            - zosmfArgs
+          args:
+            command: "echo 'Hello, World!'"
+          

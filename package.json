@@ -1,0 +1,200 @@
+{
+  "name": "@zowe/tasks-for-zowe-cli",
+  "version": "0.1.0",
+  "description": "Zowe CLI Tasks Plugin",
+  "keywords": [
+    "zowe",
+    "cli",
+    "plugin",
+    "tasks",
+    "zos"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zowe/zowe-cli-tasks-plugin.git"
+  },
+  "main": "lib/index.js",
+  "files": [
+    "lib"
+  ],
+  "scripts": {
+    "build": "node scripts/updateLicense.js && tsc --pretty && npm run checkTestsCompile",
+    "checkTestsCompile": "echo \"Checking that test source compiles...\" && tsc --project __tests__/test-tsconfig.json --noEmit ",
+    "prebuild": "npm run clean && npm run lint && echo Using TypeScript && tsc --version",
+    "clean": "rimraf lib",
+    "watch": "tsc --pretty --watch",
+    "prepublishOnly": "npm run build",
+    "lint": "tslint \"src/**/*.ts\"",
+    "test": "npm run test:unit && npm run test:integration && npm run test:system",
+    "test:system": "env-cmd __tests__/__resources__/env/system.env jest .*/__system__/.* --coverage false",
+    "test:integration": "env-cmd __tests__/__resources__/env/integration.env jest .*/__integration__/.* --coverage false",
+    "test:unit": "env-cmd __tests__/__resources__/env/unit.env jest --coverage --testPathIgnorePatterns \".*/__system__|__integration__/.*\"",
+    "installPlugin": "npm install && npm run clean && npm run build && zowe plugins install ."
+  },
+  "imperative": {
+    "pluginHealthCheck": "./lib/healthCheck.Handler",
+    "pluginSummary": "Zowe CLI Tasks Plugin",
+    "pluginAliases": [
+      "tsk"
+    ],
+    "rootCommandDescription": "Welcome to the Zowe Tasks Plugin",
+    "productDisplayName": "Zowe CLI Tasks Plugin",
+    "name": "tasks",
+    "definitions": [
+      {
+        "name": "run",
+        "summary": "Run tasks contained in your 'zowe-tasks.yml' file",
+        "description": "Run tasks contained in your 'zowe-tasks.yml' file",
+        "type": "command",
+        "handler": "./lib/cli/run.handler",
+        "options": [
+          {
+            "name": "config-file",
+            "aliases": [],
+            "description": "The configuration file to use for this run.",
+            "type": "string",
+            "required": false,
+            "defaultValue": "zowe-tasks.yml"
+          },
+          {
+            "name": "user-config-files",
+            "aliases": [],
+            "description": "The user input configuration files to use for this run. Use additional user config files to supply or change configuration input. For example, you can supply a configuration file with default connection details and override them as needed with a second file. Useful when you need to run tasks with multiple different sets of configuration. The precedence is the order specified (leftmost takes precedence).",
+            "type": "array",
+            "required": false
+          },
+          {
+            "name": "log-output",
+            "aliases": [],
+            "description": "Specifies if you want to log the output of actions. This can be helpful as you are building your tasks to check what the results will be of an action. You can then better form your validators and JSON extractors.",
+            "type": "boolean",
+            "required": false,
+            "defaultValue": false
+          },
+          {
+            "name": "regex",
+            "description": "Indicates that the run \"task\" name specified is a regular expression (runs any task that matches the expression).",
+            "required": false,
+            "type": "boolean",
+            "defaultValue": false
+          }
+        ],
+        "positionals": [
+          {
+            "name": "task",
+            "description": "The name of the task you would like to run. Omitting this parameter runs all tasks. Use \"--regex\" to indicate you have supplied a regular expression and to run tasks matching your RegEx.",
+            "required": false,
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "name": "list",
+        "summary": "List information about tasks, etc.",
+        "description": "List information about tasks, etc.",
+        "type": "group",
+        "children": [
+          {
+            "name": "functions",
+            "summary": "List all available built-in functions",
+            "description": "List all available built-in functions (functions that come with this plugin).",
+            "type": "command",
+            "handler": "./lib/cli/list.functions.handler",
+            "options": [],
+            "positionals": []
+          }
+        ]
+      }
+    ]
+  },
+  "peerDependencies": {
+    "@zowe/cli": "^5.14.2",
+    "@zowe/imperative": "^4.2.1"
+  },
+  "dependencies": {
+    "@zowe/cli": "^6.0.0",
+    "@zowe/imperative": "^4.2.1",
+    "chalk": "^2.4.2",
+    "chokidar": "^3.2.1",
+    "cli-spinner": "^0.2.10",
+    "glob": "^7.1.4",
+    "handlebars": "^4.4.2",
+    "js-yaml": "^3.13.1",
+    "jsonpath": "^1.0.2",
+    "lodash": "^4.17.15",
+    "lodash.merge": "^4.6.2",
+    "mkdirp": "^0.5.1"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^8.0.0",
+    "@types/jest": "^20.0.5",
+    "@types/node": "^8.0.0",
+    "@types/yargs": "8.0.2",
+    "env-cmd": "^8.0.2",
+    "fs-extra": "^5.0.0",
+    "jest": "^24.3.1",
+    "jest-cli": "^24.3.1",
+    "jest-environment-node": "^24.3.1",
+    "jest-environment-node-debug": "^2.0.0",
+    "jest-html-reporter": "^2.2.0",
+    "jest-junit": "^3.6.0",
+    "jest-stare": "^1.0.5",
+    "rimraf": "^2.7.1",
+    "ts-jest": "^24.0.0",
+    "ts-node": "^3.2.0",
+    "tslint": "^5.0.0",
+    "typedoc": "^0.15.0",
+    "typescript": "3.2.2",
+    "uuid": "^3.2.1"
+  },
+  "jest": {
+    "modulePathIgnorePatterns": [
+      "__tests__/__snapshots__/"
+    ],
+    "testResultsProcessor": "jest-stare",
+    "transform": {
+      ".(ts)": "ts-jest"
+    },
+    "testRegex": "(test|spec)\\.ts$",
+    "moduleFileExtensions": [
+      "ts",
+      "js"
+    ],
+    "testPathIgnorePatterns": [
+      "<rootDir>/__tests__/__results__"
+    ],
+    "testEnvironment": "node",
+    "collectCoverageFrom": [
+      "src/**/*.ts",
+      "!**/__tests__/**",
+      "!**/index.ts",
+      "!**/main.ts"
+    ],
+    "collectCoverage": false,
+    "coverageReporters": [
+      "json",
+      "lcov",
+      "text",
+      "cobertura"
+    ],
+    "coverageDirectory": "<rootDir>/__tests__/__results__/unit/coverage"
+  },
+  "jest-stare": {
+    "resultDir": "__tests__/__results__/jest-stare",
+    "additionalResultsProcessors": [
+      "jest-junit",
+      "jest-html-reporter"
+    ],
+    "coverageLink": "../coverage/lcov-report/index.html"
+  },
+  "jest-junit": {
+    "output": "__tests__/__results__/junit.xml"
+  },
+  "jest-html-reporter": {
+    "pageTitle": "Zowe CLI Sample Plugin Test Results",
+    "outputPath": "__tests__/__results__/results.html",
+    "includeFailureMsg": true
+  },
+  "author": "Darkside",
+  "license": "EPL-2.0"
+}
