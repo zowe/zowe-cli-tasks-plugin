@@ -104,26 +104,25 @@ node('ca-jenkins-agent') {
      def INTEGRATION_TEST_ROOT= "__tests__/__results__/integration"
      def INTEGRATION_JUNIT_OUTPUT = "$INTEGRATION_TEST_ROOT/junit.xml"
      // Perform a unit test and capture the results
-    pipeline.test(
-        name: "Integration",
-        operation: {
-            sh "npm i -g @zowe/cli@latest"
-            sh "npm run test:integration"
-        },
-        testResults: [dir: "${INTEGRATION_TEST_ROOT}/jest-stare", files: "index.html", name: "${PRODUCT_NAME} - Integration Test Report"],
-        junitOutput: INTEGRATION_JUNIT_OUTPUT,
-    )
+    // pipeline.test(
+    //     name: "Integration",
+    //     operation: {
+    //         sh "npm i -g @zowe/cli@latest"
+    //         sh "npm run test:integration"
+    //     },
+    //     testResults: [dir: "${INTEGRATION_TEST_ROOT}/jest-stare", files: "index.html", name: "${PRODUCT_NAME} - Integration Test Report"],
+    //     junitOutput: INTEGRATION_JUNIT_OUTPUT,
+    // )
     
     // Check for vulnerabilities
     pipeline.checkVulnerabilities()
     
-/*
     // Deploys the application if on a protected branch. Give the version input
     // 30 minutes before an auto timeout approve.
     pipeline.deploy(
         versionArguments: [timeout: [time: 30, unit: 'MINUTES']]
     )
-*/
+
     // Once called, no stages can be added and all added stages will be executed. On completion
     // appropriate emails will be sent out by the shared library.
     pipeline.end()
