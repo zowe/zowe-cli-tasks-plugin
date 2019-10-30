@@ -2,6 +2,9 @@
   "name": "@zowe/tasks-for-zowe-cli",
   "version": "0.1.0",
   "description": "Zowe CLI Tasks Plugin",
+  "publishConfig": {
+    "registry": "https://gizaartifactory.jfrog.io/gizaartifactory/api/npm/npm-local-release/"
+  },
   "keywords": [
     "zowe",
     "cli",
