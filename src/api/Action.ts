@@ -486,6 +486,7 @@ export default class Action extends BaseRunner {
     private runExec(): Promise<IRunResult> {
         return new Promise<IRunResult>((resolve, reject) => {
             exec(this.action.action.run, (error: Error, stdout: string, stderr: string) => {
+                // TODO: Clean this up get stdout and stderr upon error
                 if (error) {
                     reject(new ActionRunException(`Failed to exec command: ${error.message}`, this.action));
                 } else {

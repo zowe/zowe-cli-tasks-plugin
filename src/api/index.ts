@@ -54,6 +54,10 @@ export * from "./interface/task/IRunTasks";
 // Validator interface exports
 export * from "./interface/validator/IValidatorVars";
 
+// Script interface exports
+export * from "./interface/script/IScript";
+export * from "./interface/script/IScriptParameters";
+
 // Exception exports
 export * from "./exception/ActionException";
 export * from "./exception/ActionInputException";
