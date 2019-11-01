@@ -1,3 +1,5 @@
+outputDir: "zowe-tasks-out-run-cli"
+
 tasks:
   run-zowe-cli:
     desc: "Run a Zowe CLI command"

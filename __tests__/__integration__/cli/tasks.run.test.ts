@@ -19,6 +19,15 @@ describe("run tasks command", () => {
         await TestEnvironment.cleanUp(TEST_ENVIRONMENT);
     });
 
+    it("should be able to substitute values from ENV and global in desc and scripts", () => {
+        const yml = path.join(TEST_ENVIRONMENT.workingDir, "zowe-tasks-substitution.yml");
+        fs.copyFileSync(path.join(__dirname, "__yaml__", "zowe-tasks-substitution.yml"), yml);
+        const output = runCliScript(path.join(__dirname, "__scripts__", "zowe-tasks-substitution.sh"),
+            TEST_ENVIRONMENT, [yml]);
+        expect(output.stdout.toString()).toMatchSnapshot();
+        expect(output.status).toBe(0);
+    });
+
     it("should be able to run a CLI command", () => {
         const yml = path.join(TEST_ENVIRONMENT.workingDir, "zowe-tasks-run-cli.yml");
         fs.copyFileSync(path.join(__dirname, "__yaml__", "zowe-tasks-run-cli.yml"), yml);
@@ -26,9 +35,9 @@ describe("run tasks command", () => {
             TEST_ENVIRONMENT, [yml]);
         expect(output.stdout.toString()).toMatchSnapshot();
         expect(output.status).toBe(0);
-        const dateTimeDir = dirs(path.join(TEST_ENVIRONMENT.workingDir, "zowe-tasks-out"));
+        const dateTimeDir = dirs(path.join(TEST_ENVIRONMENT.workingDir, "zowe-tasks-out-run-cli"));
         const outputLogPath = path.join(TEST_ENVIRONMENT.workingDir,
-            "zowe-tasks-out",
+            "zowe-tasks-out-run-cli",
             dateTimeDir[0],
             "task_sequence_1_run-zowe-cli",
             "action_sequence_2_runCommand",

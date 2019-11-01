@@ -6,3 +6,10 @@ Task - run-zowe-cli - \\"Run a Zowe CLI command\\"
    ✔   Action (runCommand) \\"Run a Zowe CLI Command\\"
 "
 `;
+
+exports[`run tasks command should be able to substitute values from ENV and global in desc and scripts 1`] = `
+"
+Task - substitution - \\"var1: Var 1 Value var2: Var 2 Value var3: Var 3 Value\\"
+   ✔   Action (Run some javascript) \\"Var 1 ValueVar 2 ValueVar 3 Value\\"
+"
+`;
