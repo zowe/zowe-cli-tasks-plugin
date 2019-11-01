@@ -44,6 +44,12 @@ input:
       - user
       - env
       - prompt  
+  accountInfo:
+    desc: "Your job account info (surround in quotes if number) -"
+    sources:
+      - user
+      - env
+      - prompt      
 
 #------------------------------------------------------------------------------#
 # Global lets you set variables that are global and static for your tasks.     #

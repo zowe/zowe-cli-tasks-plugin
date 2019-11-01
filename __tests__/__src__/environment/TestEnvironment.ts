@@ -15,7 +15,6 @@ import * as nodePath from "path";
 import {mkdirpSync} from "fs-extra";
 import {ITestEnvironment} from "./doc/response/ITestEnvironment";
 import * as fs from "fs";
-import {TempTestProfiles} from "./TempTestProfiles";
 import {TemporaryScripts} from "./TemporaryScripts";
 import {runCliScript} from "../TestUtils";
 import {ITestPropertiesSchema} from "./doc/ITestPropertiesSchema";
@@ -73,10 +72,6 @@ export class TestEnvironment {
             result.pluginInstalled = true;
         }
 
-        // the result of the test environment setup so far is used to create profiles
-        result.tempProfiles = await TempTestProfiles.createProfiles(result, params.tempProfileTypes);
-
-
         // Return the test environment including working directory that the tests should be using
         return result;
     }
@@ -90,9 +85,6 @@ export class TestEnvironment {
      * @throws errors if profiles fail to delete
      */
     public static async cleanUp(testEnvironment: ITestEnvironment) {
-        if (testEnvironment.tempProfiles != null) {
-            await TempTestProfiles.deleteProfiles(testEnvironment);
-        }
         if (testEnvironment.pluginInstalled) {
             const pluginDir = testEnvironment.workingDir + "/plugins";
             require("rimraf").sync(pluginDir);
@@ -171,8 +163,7 @@ export class TestEnvironment {
             throw new ImperativeError({
                 msg: "Install of '@zowe/zowe-cli-sample-plugin' plugin failed! You should delete the script: \n'" + scriptPath + "' " +
                     "after reviewing it to check for possible errors.\n Output of the plugin install command:\n" + output.stderr.toString() +
-                    output.stdout.toString() +
-                    TempTestProfiles.GLOBAL_INSTALL_NOTE
+                    output.stdout.toString()
             });
         }
         IO.deleteFile(scriptPath);
