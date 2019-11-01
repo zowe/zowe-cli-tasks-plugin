@@ -22,7 +22,8 @@ describe("run tasks command", () => {
     beforeAll(async () => {
         TEST_ENVIRONMENT = await TestEnvironment.setUp({
             testName: "run_tasks_command",
-            installPlugin: true
+            installPlugin: true,
+            skipProperties: true
         });
     });
 
