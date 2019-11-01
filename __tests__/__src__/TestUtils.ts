@@ -35,6 +35,9 @@ export function runCliScript(scriptPath: string, testEnvironment: ITestEnvironme
             childEnv[key] = testEnvironment.env[key];
         }
 
+        // Prepend to args the path to main JS file of local Zowe install
+        args.unshift(__dirname + "/../../node_modules/@zowe/cli/lib/main.js");
+
         // Execute the command synchronously
         return spawnSync("sh", [`${scriptPath}`].concat(args), {cwd: testEnvironment.workingDir, env: childEnv});
     } else {

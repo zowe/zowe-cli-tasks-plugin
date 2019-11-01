@@ -1,0 +1,9 @@
+tasks:
+  run-zowe-cli:
+    desc: "Run a Zowe CLI command"
+    actions:
+      - name: "runCommand"
+        desc: "Run a Zowe CLI Command"
+        action:
+          type: "cmd"
+          run: "plugins list"

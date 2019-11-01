@@ -485,10 +485,14 @@ export default class Action extends BaseRunner {
      */
     private runExec(): Promise<IRunResult> {
         return new Promise<IRunResult>((resolve, reject) => {
-            exec(this.action.action.run, (error: Error, stdout: string, stderr: string) => {
-                // TODO: Clean this up get stdout and stderr upon error
+            exec(this.action.action.run, (error: any, stdout: string, stderr: string) => {
                 if (error) {
-                    reject(new ActionRunException(`Failed to exec command: ${error.message}`, this.action));
+                    // Error.message already contains stderr, we will append
+                    // STDOUT in case it has any relevant information, also
+                    // error.code should have the exit code of the command
+                    let errMsg = (stdout != null && stdout.trim().length > 0) ? chalk.blue("Command Stdout:") + "\n" + stdout + "\n" : "";
+                    errMsg += `Command failed with exit code "${error.code}".`;
+                    reject(new ActionRunException(`Failed to exec command: ${error.message}\n${errMsg}`, this.action));
                 } else {
                     resolve({
                         data: {

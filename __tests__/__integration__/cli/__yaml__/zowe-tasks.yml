@@ -1,0 +1,15 @@
+input:
+  scriptPath:
+    desc: "path to the script file"
+    sources:
+      - env
+
+tasks:
+  exec-command:
+    desc: "Exec a command that gives stderr and stdout"
+    actions:
+      - name: "execCommand"
+        desc: "Exec a command that gives stderr and stdout"
+        action:
+          type: "exec"
+          run: "sh ${scriptPath}"

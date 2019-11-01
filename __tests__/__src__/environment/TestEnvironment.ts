@@ -160,9 +160,9 @@ export class TestEnvironment {
     private static async installPlugin(testEnvironment: ITestEnvironment) {
         // TODO: update references to your plugin name
         let installScript: string = TemporaryScripts.SHEBANG;
-        installScript += TemporaryScripts.ZOWE_BIN + " plugins install ../../../../\n"; // install plugin from root of project
-        installScript += TemporaryScripts.ZOWE_BIN + " plugins validate @zowe/zowe-cli-sample-plugin\n";
-        installScript += TemporaryScripts.ZOWE_BIN + " zcsp --help\n"; // check that the plugin help is available
+        installScript += `node "${TemporaryScripts.ZOWE_JS}" plugins install ../../../../\n`; // install plugin from root of project
+        installScript += `node "${TemporaryScripts.ZOWE_JS}" plugins validate @broadcom/jclcheck-for-zowe-cli\n`;
+        installScript += `node "${TemporaryScripts.ZOWE_JS}" tasks --help\n`; // check that the plugin help is available
         const scriptPath = testEnvironment.workingDir + "/install_plugin.sh";
         IO.writeFile(scriptPath, Buffer.from(installScript));
 

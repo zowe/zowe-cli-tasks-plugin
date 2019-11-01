@@ -1,0 +1,8 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`run tasks command should be able to run a CLI command 1`] = `
+"
+Task - run-zowe-cli - \\"Run a Zowe CLI command\\"
+   ✔   Action (runCommand) \\"Run a Zowe CLI Command\\"
+"
+`;

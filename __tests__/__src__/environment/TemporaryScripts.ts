@@ -15,5 +15,6 @@ export class TemporaryScripts {
      */
     public static readonly SHEBANG = "#!/bin/bash\n\n";
 
-    public static readonly ZOWE_BIN = "zowe";
+    public static readonly ZOWE_JS = __dirname + "/../../../node_modules/@zowe/cli/lib/main.js";
 }
+
