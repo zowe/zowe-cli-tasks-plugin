@@ -37,8 +37,9 @@ You can now script these actions in Yaml. For example, here is submitting a job 
 From a task's "action" you can run any of the following:
 - Any Zowe CLI command (or plugin command) you have installed (e.g. `zowe jobs ls jobs`)
 - Any host command (e.g. `ls -la`)
-- Inline JavaScript function
-- 
+- Inline JavaScript function (sync or async)
+- A built in function (provided by the tasks plugin)
+- A JavaScript script file that contains the appropriate default export
 
 Checkout the [example](./example) directory for a complete example. 
 
