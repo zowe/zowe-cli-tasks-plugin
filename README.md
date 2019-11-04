@@ -1,6 +1,11 @@
 # Zowe CLI Tasks Plugin
 **Note:** This is a work in progress plugin and should be considered an alpha state. Functionality is subject to change.
 
+Installing: 
+```
+zowe plugins install @zowe/tasks-for-zowe-cli
+```
+
 Use cases: 
 - Consolidate your Zowe build/script logic into a single Yaml file
 - Consolidate the input to your Zowe automation in a single file (no need for multiple profiles)
@@ -41,7 +46,9 @@ From a task's "action" you can run any of the following:
 - A built in function (provided by the tasks plugin)
 - A JavaScript script file that contains the appropriate default export
 
-Checkout the [example](./example) directory for a complete example. 
+Checkout a short [tutorial](./docs/starter.md) to learn about Zowe tasks and the yml configuration file.
+
+Checkout the [example](./example) directory for a more complete example. 
 
 # Building and Installing the Plugin from Source
 1. `npm install`

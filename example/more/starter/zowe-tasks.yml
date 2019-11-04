@@ -1,0 +1,67 @@
+#------------------------------------------------------------------------------#
+# This tasks script will check if the version of z/OSMF >= 26 and if the       # 
+# "z/OS Operator Consoles" plugin is installed.                                #
+#------------------------------------------------------------------------------#
+
+#------------------------------------------------------------------------------#
+# The script requires two inputs:                                              #
+#                                                                              #
+#    host - the z/OSMF hostname                                                #
+#    port - the z/OSMF port                                                    #
+#                                                                              #
+# The "zowe zosmf check status" command does not require credentials.          #
+#------------------------------------------------------------------------------#
+input: 
+  host:
+    desc: "The hostname of your z/OSMF instance"
+    sources:
+      - user
+      - env
+      - prompt
+  port:
+    desc: "The port of your z/OSMF instance"
+    sources:
+      - user
+      - env
+      - prompt
+
+#------------------------------------------------------------------------------#
+# Task: check-status                                                           #
+#                                                                              #
+#   1. Issue the `zowe zosmf check status` command and extract the installed   #
+#      plugins and check if the z/OSMF version >= 26.                          #
+#   2. Use a small JavaScript snippet to check if the "z/OS Operator Consoles" #
+#      plugin is installed.                                                    #
+#                                                                              #
+#------------------------------------------------------------------------------#
+tasks:
+  check-status:
+    desc: "Check the status of z/OSMF"
+    actions:
+      - name: "checkZosmfStatus"
+        desc: "Check the status of z/OSMF on ${host}"
+        action:
+          type: "cmd"
+          run: "zosmf check status"
+        args: 
+          host: ${host}
+          port: ${port}
+        jsonExtractor:
+          plugins: "$.data.plugins"
+        validators:
+          - exp: "parseInt(output.data[\"zosmf_version\"],10) >= 26" 
+      - name: "checkIfConsole"
+        desc: "Check if the z/OS Operator Consoles plugin in installed"
+        onSuccessMsg: "z/OS Operator Consoles is installed!"
+        action:
+          type: "js"
+          run: >
+            for (let plugin of plugins) {
+                if (plugin.pluginDefaultName === "z/OS Operator Consoles") {
+                    return;
+                }
+            }
+            throw new Error("z/OS Operator Consoles is NOT defined");
+        args:
+          plugins: ${extracted.plugins}
+          
