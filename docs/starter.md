@@ -290,7 +290,7 @@ Zowe tasks can also validate the output from `actions`. For example, we could en
           - exp: "parseInt(output.data[\"zosmf_version\"],10) >= 26" 
 ```
 
-`validators` allow you to specify an array of expressions (`exp`) that will be evaluated with JavaScript `eval`. The `output` variable is the output from the `zosmf check status` command (remember with the `--response-format-json` applied). The `exp` statement is the verbatim JavaScript statement that will be executed to check the output.
+`validators` allow you to specify an array of expressions (`exp`) that will be evaluated with JavaScript `eval`. The `output` variable is the output from the `zosmf check status` command (remember with the `--response-format-json` applied). The `exp` statement is the verbatim JavaScript statement that will be executed to check the output. If the validator returns `true` then the output is considered valid. 
 
 For the sake of the example, we'll test our validator by specifying  `>= 100`:
 ```
