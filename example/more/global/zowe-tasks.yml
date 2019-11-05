@@ -1,0 +1,86 @@
+#------------------------------------------------------------------------------#
+# Input requires host, port, user, and password                                #
+#------------------------------------------------------------------------------#
+input: 
+  host:
+    desc: "The hostname of your z/OSMF instance"
+    sources:
+      - user
+      - env
+      - prompt
+  port:
+    desc: "The port of your z/OSMF instance"
+    sources:
+      - user
+      - env
+      - prompt
+  user: 
+    desc: "Your user ID for z/OSMF" 
+    sources: 
+      - user
+      - env
+      - prompt
+  password:
+    desc: "Your password for z/OSMF"
+    mask: true
+    sources: 
+      - user
+      - env
+      - prompt
+
+#------------------------------------------------------------------------------#
+# Args that can be merged using mergeArgs into args for each command.          #
+#------------------------------------------------------------------------------#
+args:
+  zosmf:
+    host: ${host}
+    port: ${port}
+    user: ${user}
+    password: ${password}
+    rejectUnauthorized: false
+
+#------------------------------------------------------------------------------#
+# Global variables for the tasks                                               #
+#------------------------------------------------------------------------------#
+global:
+  dataSetHLQ: ${user}.MYPROJ
+  dataSetsToCreate:
+    - dataset: ${dataSetHLQ}.LOADLIB
+      cmdType: "bin"
+    - dataset: ${dataSetHLQ}.JCL
+      cmdType: "classic"
+
+#------------------------------------------------------------------------------#
+# Task: create-project-datasets                                                #
+#                                                                              #
+#   1. Using the "forEach" capability, create all data sets found in the       #
+#      global "dataSetsToCreate" array (only if they don't already exist)      #
+#                                                                              #
+#------------------------------------------------------------------------------#
+tasks:
+  create-project-datasets:
+    desc: "Create a few project data sets"
+    actions:
+      - name: "createLoadlib"
+        desc: "Create the data set ${extracted.dataset}"
+        repeat:
+          forEach: ${dataSetsToCreate}
+        conditions:
+          - name: "checkIfLoadlibExists"
+            desc: "Check if ${extracted.dataset} exists"
+            action:
+              type: "func"
+              run: "datasetExists"
+            mergeArgs:
+              - zosmf
+            args:
+              dataset: ${extracted.dataset}
+            validators:
+              - exp: "output.exists === false"
+        action:
+          type: "cmd"
+          run: "files create ${extracted.cmdType}"
+        mergeArgs:
+          - zosmf
+        args:
+          dataSetName: ${extracted.dataset}

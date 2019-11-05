@@ -1,5 +1,5 @@
 #------------------------------------------------------------------------------#
-# Input requires host, port, user, and password                                #
+# Input requires host, port, user, password, and job                           #
 #------------------------------------------------------------------------------#
 input: 
   host:
