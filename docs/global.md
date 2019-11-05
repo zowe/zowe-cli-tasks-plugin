@@ -18,6 +18,8 @@ global:
 
 Notice we have also defined an array of `dataSetsToCreate`, that can be used on `forEach`. 
 
+`global` is a "free-form" object that you can create based on your needs. You can specify anything you'd like under `global` and it can be referenced throughout your scripts. 
+
 We can then add some [input](./input.md) to our script to resolve `${user}`:
 ```
 input: 

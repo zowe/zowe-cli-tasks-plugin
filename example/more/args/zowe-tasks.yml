@@ -1,0 +1,109 @@
+#------------------------------------------------------------------------------#
+# Input requires host, port, user, and password                                #
+#------------------------------------------------------------------------------#
+input: 
+  host:
+    desc: "The hostname of your z/OSMF instance"
+    sources:
+      - user
+      - env
+      - prompt
+  port:
+    desc: "The port of your z/OSMF instance"
+    sources:
+      - user
+      - env
+      - prompt
+  user: 
+    desc: "Your user ID for z/OSMF" 
+    sources: 
+      - user
+      - env
+      - prompt
+  password:
+    desc: "Your password for z/OSMF"
+    mask: true
+    sources: 
+      - user
+      - env
+      - prompt
+  account: 
+    desc: "Your account information"
+    sources:
+      - user
+      - env
+      - prompt
+
+#------------------------------------------------------------------------------#
+# Create a set of args called "zosmfArgs" for use in Zowe command              #
+#------------------------------------------------------------------------------#
+args:
+  zosmfArgs:
+    host: ${host}
+    port: ${port}
+    user: ${user}
+    password: ${password}
+    rejectUnauthorized: false
+
+#------------------------------------------------------------------------------#
+# Task: issue-tso                                                              #
+#                                                                              #
+#   1. Starts a TSO address space an extracts the servlet key for future use   #
+#   2. Issues STATUS command in our TSO address space                          #
+#   3. Issues LISTALC command in our TSO address space                         #
+#   4. Stops the TSO address space that was started in (1)                     #
+#                                                                              #
+#------------------------------------------------------------------------------#
+tasks:
+  issue-tso:
+    desc: "Start a TSO address space an issue commands"
+    actions:
+      - name: "startTSOAddressSpace"
+        desc: "Starting a TSO address space to issue commands"
+        action:
+          type: "cmd"
+          run: "tso start as"
+        mergeArgs:
+          - zosmfArgs
+        args:
+          account: ${account}
+        jsonExtractor:
+          tsoServletKey: $.data.servletKey     
+      - name: "issueTSOStatus"
+        desc: "Issue the status command"
+        onError: "stopTSOAddressSpace"
+        action:
+          type: "cmd"
+          run: "tso send as"
+        mergeArgs:
+          - zosmfArgs
+        args:
+          servletKey: ${extracted.tsoServletKey}
+          data: "STATUS"
+      - name: "issueTSOLISTALC"
+        desc: "Issue the listalc command"
+        onError: "stopTSOAddressSpace"
+        action:
+          type: "cmd"
+          run: "tso send as"
+        mergeArgs:
+          - zosmfArgs
+        args:
+          servletKey: ${extracted.tsoServletKey}
+          data: "LISTALC"
+      - "stopTSOAddressSpace"
+
+#------------------------------------------------------------------------------#
+# Helper actions and tasks                                                     #
+#------------------------------------------------------------------------------#
+helpers:
+  actions:
+    - name: "stopTSOAddressSpace"
+      desc: "Stop the TSO address space (${extracted.tsoServletKey})"
+      action:
+        type: "cmd"
+        run: "tso stop as"
+      mergeArgs:
+        - zosmfArgs
+      args:
+        servletkey: ${extracted.tsoServletKey}
