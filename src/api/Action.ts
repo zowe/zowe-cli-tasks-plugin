@@ -16,7 +16,7 @@ import ActionRunException from "./exception/ActionRunException";
 import { IRunResult } from "./interface/run/IRunResult";
 import ActionValidator from "./ActionValidator";
 const JsonPath = require("jsonpath");
-const Spinner = require("cli-spinner").Spinner;
+// const Spinner = require("cli-spinner").Spinner;
 import Functions from "./Functions";
 import { ICommandResponse, ICommandDefinition, CommandProcessor, Imperative } from "@zowe/imperative";
 import { ProfileManagerFactory } from "./zowe/ProfileManagerFactory";
@@ -32,6 +32,7 @@ import Utils from "./Utils";
 import { IScript } from "./interface/script/IScript";
 import * as path from "path";
 const chalk = require("chalk");
+const ora = require("ora");
 
 export default class Action extends BaseRunner {
     public static async run(params: IRunAction) {
@@ -94,14 +95,13 @@ export default class Action extends BaseRunner {
             return;
         }
 
-        // Start the spinner and lo that the action is running
-        const spinner = new Spinner({
-            text: this.msgIndent + `   %s   Action (${this.name}) "${this.action.desc}"`,
-            stream: process.stderr
-        });
-        spinner.setSpinnerString("|/-\\");
-        // TODO: Figure out a better way
+        // If the action is not silent, start the spinner
+        let spinner;
         if (!this.console.silent) {
+            spinner = ora({
+                text: `  Action (${this.name}) "${this.action.desc}"`,
+                prefixText: this.msgIndent + "  "
+            });
             spinner.start();
         }
 
@@ -172,9 +172,10 @@ export default class Action extends BaseRunner {
 
         // Stop the spinner and log any messages
         // TODO: Figure out a better way
-        if (!this.console.silent) {
-            spinner.stop(true);
+        if (spinner != null) {
+            spinner.stop();
         }
+
         if (this.result && this.result.warnings != null && this.result.warnings.length > 0) {
             this.console.logMultiLineFuncWarning(this.msgIndent, this.result.warnings);
         }
