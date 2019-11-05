@@ -2,7 +2,7 @@
 The Zowe Tasks plugin for Zowe CLI lets you define sets of automation/build tasks in a yml file, similar to using build tools like CircleCI, Drone, Travis, etc.
 
 To start, create a `zowe-tasks.yml` file in your project. For example:
-```
+```yaml
 tasks:
   check-status:
     desc: "Check the status of z/OSMF"
@@ -30,7 +30,7 @@ Task - check-status - "Check the status of z/OSMF"
 `zowe-tasks.yml` is the default configuration file that is used when issuing `zowe tasks run` (you can specify an alternate config file using `--config-file`).
 
 In `zowe-tasks.yml`, you define your `tasks`, which are an array of `actions`. In the example provided, we have one task called `check-status` that contains a single `action`. The `action` issues the Zowe CLI command `zosmf check status` (notice there is no need to specify `zowe`):
-```
+```yaml
       - name: "checkZosmfStatus"
         desc: "Check the status of z/OSMF"
         action:
