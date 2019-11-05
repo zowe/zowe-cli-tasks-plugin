@@ -12,7 +12,7 @@ You can use the `helpers.tasks` property to define additional "function-like" ta
 You can use `helpers.actions` to define additional "function-like" actions that can be called in a task. 
 
 For example, lets define a set of helper tasks and actions that we can reuse:
-```
+```yaml
 helpers:
   tasks:
     issue-ssh:
@@ -90,7 +90,7 @@ helpers:
 In the above example, we've defined two helper `tasks` called `issue-tso` and `issue-ssh`. The former, starts a TSO address space, issues 2 commands, and stops the TSO address space. The latter, issues 2 ssh commands. 
 
 For these to run, we need to invoke them from the tasks (and we'll add the necessary user [input](./input.md) as well):
-```
+```yaml
 input: 
   host:
     desc: "The hostname of your z/OSMF instance"

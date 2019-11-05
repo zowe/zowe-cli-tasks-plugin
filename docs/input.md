@@ -10,7 +10,7 @@ The complete example described in this document can be found [here](../example/m
 For example, let's say our tasks needed `host`, `port`, `user`, `password`, and `job` to operate. 
 
 We can define these as inputs using the `input` property:
-```
+```yaml
 input: 
   host:
     desc: "The hostname of your z/OSMF instance"
@@ -54,7 +54,7 @@ Under the `input` property, we specify the input variable by name (e.g. `passwor
 
 ## Using User Input
 Now let's define a task in our `zowe-tasks.yml` to check if the input `job` is active on the system:
-```
+```yaml
 tasks:
   job-active:
     desc: "Determine if ${job} is ACTIVE"
@@ -132,7 +132,7 @@ Action "checkForActive" (run: "for (let j of jobs..." desc: "Check if a job with
 Notice we specified `host` and `port` as environment variables and Zowe tasks only prompted for `user`, `password`, and `job`. 
 
 We can also persist everything in the `zowe-tasks-user.yml` for convenience if we plan on re-running this task constantly: 
-```
+```yaml
 host: my.zosmf.host
 port: 12345
 user: mytsouserid

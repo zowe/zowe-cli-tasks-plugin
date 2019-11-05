@@ -22,7 +22,7 @@ For example, a common workflow might be:
 - Verify that the Job finished CC 0000
 
 You can now script these actions in Yaml. For example, here is submitting a job and extracting the jobname and jobid for use in future actions:
-```
+```yaml
 ...
       - name: "submitIefbr14Job"
         desc: "Submit the rendered IEFBR14"

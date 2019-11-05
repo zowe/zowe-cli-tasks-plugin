@@ -50,7 +50,7 @@ As mentioned, our example tasks script requires that the user has a default prof
 To gather the required input, we can use the `input` property in our `zowe-tasks.yml` file. The order doesn't matter, but for readability, add `input` to the top of your `zowe-tasks.yml`: 
 
 
-```
+```yaml
 # Zowe Tasks input 
 input: 
   host:
@@ -115,7 +115,7 @@ In order to determine the argument names, we can use `zowe zosmf check status -h
 The arguments we want to supply are `--host` and `--port`. 
 
 We can supply these options to the `cmd` we want to `run` (`zosmf check status`) by using the `args` property:
-```
+```yaml
       - name: "checkZosmfStatus"
         desc: "Check the status of z/OSMF"
         action:
@@ -173,7 +173,7 @@ Task - check-status - "Check the status of z/OSMF"
 ```
 
 We can use these input variables anywhere in the script. For example, let's print the name of the host in the `action` description:
-```
+```yaml
       - name: "checkZosmfStatus"
         desc: "Check the status of z/OSMF on ${host}"
         action:
@@ -197,7 +197,7 @@ Notice "my.zosmf.host" appeared in the action text.
 
 Next, we can use the output from the check status command in subsequent `actions`. When running commands with Zowe tasks, Zowe command output is always returned using the `--reponse-format-json` flag to make it simpler to extract. Zowe CLI always returns the following fields with `--rfj`:
 
-```
+```json
 {
   "success": true,
   "exitCode": 0,
@@ -209,7 +209,7 @@ Next, we can use the output from the check status command in subsequent `actions
 ```
 
 The `data` property can be very useful when extracting information. For example, the `zosmf check status` command returns the enabled plugins:
-```
+```json
   "data": {
     "zos_version": "04.26.00",
     "zosmf_port": "12345",
@@ -225,7 +225,7 @@ The `data` property can be very useful when extracting information. For example,
 ```
 
 We can extract this data for future usage by updating our `action` with a `jsonExtractor`:
-```
+```yaml
       - name: "checkZosmfStatus"
         desc: "Check the status of z/OSMF"
         action:
@@ -241,7 +241,7 @@ We can extract this data for future usage by updating our `action` with a `jsonE
 The `jsonExtractor` specified will extract the data from the `--reponse-format-json` output of the `zosmf check status` command and assign it to a Zowe tasks variable called `plugins`. The `jsonExtractor` uses the standard JSON path query language. In further actions, we can refer to the extracted variable with `${extracted.plugins}`.
 
 Let's use the extracted plugins data in a new `action` we'll add to the end of our `zowe-tasks.yml` file:
-```
+```yaml
       - name: "checkIfConsole"
         desc: "Check if the z/OS Operator Consoles plugin in installed"
         onSuccessMsg: "z/OS Operator Consoles is installed!"
@@ -275,7 +275,7 @@ Task - check-status - "Check the status of z/OSMF"
 ```
 
 Zowe tasks can also validate the output from `actions`. For example, we could ensure that the `zosmf_version` is greater than or equal to `26` by adding `validators`:
-```
+```yaml
       - name: "checkZosmfStatus"
         desc: "Check the status of z/OSMF"
         action:
@@ -293,7 +293,7 @@ Zowe tasks can also validate the output from `actions`. For example, we could en
 `validators` allow you to specify an array of expressions (`exp`) that will be evaluated with JavaScript `eval`. The `output` variable is the output from the `zosmf check status` command (remember with the `--response-format-json` applied). The `exp` statement is the verbatim JavaScript statement that will be executed to check the output. If the validator returns `true` then the output is considered valid. 
 
 For the sake of the example, we'll test our validator by specifying  `>= 100`:
-```
+```yaml
         validators:
           - exp: "parseInt(output.data[\"zosmf_version\"],10) >= 100" 
 ```

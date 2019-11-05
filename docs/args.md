@@ -6,7 +6,7 @@ The complete example described in this document can be found [here](../example/m
 In most of our tasks, we're going to want to issue Zowe CLI commands. However, we don't want to have to specify the same set of arguments over and over (e.g. host, port, user, password) for each command.
 
 We can use the `args` property to define named sets of arguments to reuse throughout our actions on the `mergeArgs` property:
-```
+```yaml
 args:
   zosmfArgs:
     host: ${host}
@@ -19,7 +19,7 @@ args:
 In the example above, we have provided a set of args called `zosmfArgs` that contains `host`, `port`, `user`, `password`, and `rejectUnauthorized`. 
 
 However, we need to resolve, for example, `${host}`, so we'll add some [input](./input.md):
-```
+```yaml
 input: 
   host:
     desc: "The hostname of your z/OSMF instance"
@@ -56,7 +56,7 @@ args:
 ```
 
 Now we can write some tasks and re-use the `zosmfArgs` where needed:
-```
+```yaml
 tasks:
   issue-tso:
     desc: "Start a TSO address space an issue commands"
