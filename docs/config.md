@@ -1,6 +1,8 @@
 # "zowe-tasks.yml" Configuration File
 `zowe-tasks.yml` is the default configuration file that is used when issuing `zowe tasks run` (the name can be overridden by the `--config-file` option).
 
+The configuration file is the starting point for Zowe tasks where you define your input, variables, tasks, actions, etc. 
+
 Full reference for each property can be found in the [interface](../src/api/interface/config/IConfig.ts).
 
 In the `zowe-tasks.yml` file, there are several root level properties that can be defined:

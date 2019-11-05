@@ -1,0 +1,75 @@
+#------------------------------------------------------------------------------#
+# Input requires host, port, user, and password                                #
+#------------------------------------------------------------------------------#
+input: 
+  host:
+    desc: "The hostname of your z/OSMF instance"
+    sources:
+      - user
+      - env
+      - prompt
+  port:
+    desc: "The port of your z/OSMF instance"
+    sources:
+      - user
+      - env
+      - prompt
+  user: 
+    desc: "Your user ID for z/OSMF" 
+    sources: 
+      - user
+      - env
+      - prompt
+  password:
+    desc: "Your password for z/OSMF"
+    mask: true
+    sources: 
+      - user
+      - env
+      - prompt
+  job: 
+    desc: "The job to check if ACTIVE"
+    sources:
+      - user
+      - env
+      - prompt
+
+#------------------------------------------------------------------------------#
+# Task: job-active                                                             #
+#                                                                              #
+#   1. Issue `zowe jobs ls jobs` to list jobs for the input job.               #
+#   2. Uses a small javascript snippet to determine if there is an ACTIVE job  #
+#      for the job specified.                                                  #
+#                                                                              #
+#------------------------------------------------------------------------------#
+tasks:
+  job-active:
+    desc: "Determine if ${job} is ACTIVE"
+    actions:
+      - name: "listJobs"
+        desc: "List jobs using prefix '${job}' and owner '*'"
+        action:
+          type: "cmd"
+          run: "jobs ls jobs"
+        args:
+          user: ${user}
+          password: ${password}
+          host: ${host}
+          port: ${port}
+          rejectUnauthorized: false
+          owner: "*"
+          prefix: ${job}
+        jsonExtractor:
+          jobsList: "$.data"
+      - name: "checkForActive"
+        desc: "Check if a job with name '${job}' is active"
+        onSuccessMsg: "A job with jobname '${job}' is ACTIVE"
+        action:
+          type: "js"
+          run: >
+            for (let j of jobsList) 
+              if (j.status === "ACTIVE") return;
+            throw new Error("No jobs with jobname ${job} are ACTIVE"); 
+        args:
+          jobsList: ${extracted.jobsList}
+        
