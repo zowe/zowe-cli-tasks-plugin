@@ -50,6 +50,8 @@ Checkout a short [tutorial](./docs/starter.md) to learn about Zowe tasks and the
 
 Checkout the [example](./example) directory for a more complete example. 
 
+For reference and in-depth information, checkout the [config](./docs/config.md) documentation.
+
 # Building and Installing the Plugin from Source
 1. `npm install`
 2. `npm run build`
