@@ -6,6 +6,7 @@ The configuration file is the starting point for Zowe tasks where you define you
 Full reference for each property can be found in the [interface](../src/api/interface/config/IConfig.ts).
 
 In the `zowe-tasks.yml` file, there are several root level properties that can be defined:
+
 Property | Description | Interface/Type | Doc
 --- | --- | --- | ---
 `tasks` | The tasks that will with after issuing `zowe tasks run`. | [ITasks.ts](../src/api/interface/config/ITasks.ts) | [starter](./starter.md)
