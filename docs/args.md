@@ -1,4 +1,4 @@
-# Zowe Tasks Args Property
+# Zowe Tasks args Property
 In your [zowe-tasks.yml](./config.md) configuration file you can specify sets of arguments that can be re-used on actions using the `args` property.
 
 The complete example described in this document can be found [here](../example/more/args/zowe-tasks.yml).

@@ -1,5 +1,5 @@
-# Zowe Tasks Helpers Property
-In your [zowe-tasks.yml](./config.md) configuration file you can specify a set of "function-like" helpers that you can "call" or "reuse" throughout your tasks. 
+# Zowe Tasks helpers Property
+In your [zowe-tasks.yml](./config.md) configuration file you can specify a set of "function-like" helpers that you can "call" or "reuse" throughout your tasks using the `helpers` property.
 
 See the [IHelpers.ts](../src/api/interface/config/IHelpers.ts) interface for full documentation.
 

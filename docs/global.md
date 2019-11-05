@@ -1,4 +1,4 @@
-# Zowe Tasks Global Property
+# Zowe Tasks global Property
 In your [zowe-tasks.yml](./config.md) configuration file you can specify a global set of default variables using the `global` property. 
 
 The complete example described in this document can be found [here](../example/more/global/zowe-tasks.yml).

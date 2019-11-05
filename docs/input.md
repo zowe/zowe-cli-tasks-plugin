@@ -1,4 +1,4 @@
-# Zowe Tasks Input Property
+# Zowe Tasks input Property
 In your [zowe-tasks.yml](./config.md) configuration file you can specify how user input should be gathered using the `input` property.
 
 See the [IInputs.ts](../src/api/interface/config/IInputs.ts) interface for full documentation. 
