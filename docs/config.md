@@ -8,7 +8,7 @@ Full reference for each property can be found in the [interface](../src/api/inte
 In the `zowe-tasks.yml` file, there are several root level properties that can be defined:
 Property | Description | Interface/Type | Doc
 --- | --- | --- | ---
-`tasks` | The tasks that will with after issuing `zowe tasks run`. | [ITasks.ts](../src/api/interface/config/ITasks.ts) | [tasks](./tasks.md)
+`tasks` | The tasks that will with after issuing `zowe tasks run`. | [ITasks.ts](../src/api/interface/config/ITasks.ts) | [starter](./starter.md)
 `input` | Allows specification of user input to the tasks. | [IInputs.ts](../src/api/interface/config/IInputs.ts) | [input](./input.md)
 `global` | Allows definition of global variables for the tasks. | keyword/value pairs | [global](./global.md)
 `args` | Allows specification of sets of arguments for `mergeArgs` | keyword/value pairs | [args](./args.md)
