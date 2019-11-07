@@ -1,3 +1,5 @@
+import { IRepeatUntilValidators } from "./IRepeatUntilValidators";
+
 /*
 * This program and the accompanying materials are made available under the terms of the
 * Eclipse Public License v2.0 which accompanies this distribution, and is available at
@@ -10,5 +12,6 @@
 */
 
 export interface IRepeatAction {
-    forEach: Array<{ [key: string]: any }>;
+    forEach?: Array<{ [key: string]: any }>;
+    untilValidatorsPass?: IRepeatUntilValidators | boolean;
 }

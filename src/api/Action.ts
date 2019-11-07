@@ -44,23 +44,41 @@ export default class Action extends BaseRunner {
         }
         Utils.traverse(action.action, action.extractedOutput, "extracted.");
 
+        // These options are mutually exclusive
+        if (params.action.repeat != null &&
+            params.action.repeat.forEach != null &&
+            params.action.repeat.untilValidatorsPass != null) {
+            const errmsg: string = `"repeat.forEach" and "repeat.untilValidatorsPass" are mutually exclusive.`;
+            action.logActionFailed(errmsg);
+            throw new ActionInputException(errmsg, action.action);
+        }
+
         // If repeat is requested, we will spawn the action multiple times
         // depending on the repeat options
-        if (params.action.repeat != null && params.action.repeat.forEach != null) {
-            for (const fe of params.action.repeat.forEach) {
-                const actn = { ...action.action };
-                const extracted = { ...action.extractedOutput, ...fe };
-                delete actn.repeat;
-                await Action.run({
-                    action: actn,
-                    name: actn.name,
-                    logDir: action.logDir,
-                    extracted,
-                    console: action.console,
-                    config: action.config,
-                    logOutput: action.logOutput,
-                    msgIndent: action.msgIndent
-                });
+        if (params.action.repeat != null) {
+
+            // For each spawns the action for each of the items in the array
+            // supplied and passes the items as extracted variables
+            if (params.action.repeat.forEach != null) {
+                for (const fe of params.action.repeat.forEach) {
+                    const actn = { ...action.action };
+                    const extracted = { ...action.extractedOutput, ...fe };
+                    delete actn.repeat;
+                    await Action.run({
+                        action: actn,
+                        name: actn.name,
+                        logDir: action.logDir,
+                        extracted,
+                        console: action.console,
+                        config: action.config,
+                        logOutput: action.logOutput,
+                        msgIndent: action.msgIndent
+                    });
+                }
+            } else if (params.action.repeat.untilValidatorsPass != null) {
+                await action.repeatUntilValidatorsPass();
+            } else {
+                throw new ActionInputException(`No properties specified on "repeat".`, action.action);
             }
         } else {
             await action.runAction();
@@ -72,6 +90,7 @@ export default class Action extends BaseRunner {
     private result: IRunResult;
     private conditional: boolean;
     private successOnFail: boolean;
+    private retries: number = 0;
 
     protected constructor(params: IRunAction) {
         super(params);
@@ -229,6 +248,94 @@ export default class Action extends BaseRunner {
         } else {
             this.actionSuccessMsg();
         }
+    }
+
+    /**
+     * Repeat an action until the validators validate the action.
+     */
+    private async repeatUntilValidatorsPass(): Promise<any> {
+        let interval: number = 1000;
+        let maxRetries: number = 0;
+        if (typeof this.action.repeat.untilValidatorsPass === "object") {
+            if (this.action.repeat.untilValidatorsPass.interval != null) {
+                interval = this.action.repeat.untilValidatorsPass.interval;
+            }
+            if (this.action.repeat.untilValidatorsPass.maxRetries != null) {
+                maxRetries = this.action.repeat.untilValidatorsPass.maxRetries;
+            }
+        }
+
+        // Start a spinner indicating that we are repeating the action and
+        // stop any further console output from the repeated action
+        const spinner = ora({
+            text: `  Repeating Action (${this.action.name}) Attempt - ` +
+                `${this.retries}/${(maxRetries === 0) ? "infinite" : maxRetries}`,
+            prefixText: this.msgIndent + "  "
+        });
+        this.console.silent = true;
+        spinner.start();
+
+        // Run the action
+        try {
+            await this.runRepeatAction(maxRetries, interval, spinner);
+        } catch (err) {
+            spinner.stop();
+            this.console.silent = false;
+            this.logActionFailed(err.message);
+            throw err;
+        }
+
+        // Stop the spinner and allow console messages
+        spinner.stop();
+        this.console.silent = false;
+        this.actionSuccessMsg();
+    }
+
+    /**
+     * Repeats an action until either the max retries are hit, the validators
+     * validate the action, OR a severe (non-validator) error occurs.
+     * @param maxRetries The maximum number of retries
+     * @param interval The interval (in ms) for each retry
+     * @param spinner The spinner to update the text
+     */
+    private runRepeatAction(maxRetries: number, interval: number, spinner: any): Promise<any> {
+        return new Promise<any>((resolve, reject) => {
+            this.retries++;
+            const actn = { ...this.action };
+            delete actn.repeat;
+            this.console.silent = true;
+            Action.run({
+                action: actn,
+                name: actn.name,
+                logDir: this.logDir,
+                extracted: this.extractedOutput,
+                console: this.console,
+                config: this.config,
+                logOutput: this.logOutput,
+                msgIndent: this.msgIndent,
+                conditional: true
+            }).then(() => {
+                resolve();
+            }).catch((err) => {
+                // console.log(err);
+                if (!(err instanceof ActionValidatorException)) {
+                    reject(err);
+                } else if (maxRetries !== 0 && this.retries >= maxRetries) {
+                    const errmsg: string = `Max retries (${maxRetries}) attempted.`;
+                    reject(new ActionRunException(errmsg, this.action));
+                } else {
+                    setTimeout(() => {
+                        spinner.text = `  Repeating Action (${this.action.name}) Attempt - ` +
+                            `${this.retries}/${(maxRetries === 0) ? "infinite" : maxRetries}`;
+                        this.runRepeatAction(maxRetries, interval, spinner).catch((repeatErr) => {
+                            reject(repeatErr);
+                        }).then(() => {
+                            resolve();
+                        });
+                    }, interval);
+                }
+            });
+        });
     }
 
     /**
