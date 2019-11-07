@@ -57,7 +57,7 @@ input:
 #------------------------------------------------------------------------------#
 global: 
   rexxPath: ./samples/example.rexx
-
+  rexxSleepPath: ./samples/exampleSleep.rexx
 #------------------------------------------------------------------------------#
 # Args can be used on the "mergeArgs" array. Args can be used to specify sets  #
 # of arguments that are required on Zowe CLI commands. Instead of specifying   #
@@ -233,8 +233,8 @@ tasks:
         args:
           jobid: ${extracted.jobid}
           spoolfileid: 3
-        validator:
-          - exp: "match(output, /${extracted.dateTimeStamp}/g)"
+        validators:
+          - exp: "match(output.stdout, /${extracted.dateTimeStamp}/g)"
             onFailure: 
               - "download-failed-job"
       - "deleteJobOutput"
@@ -365,10 +365,59 @@ tasks:
         args:
           jobid: ${extracted.jobid}
           spoolfileid: 103
-        validator:
-          - exp: "match(output, /Hello, World!/g)"
+        validators:
+          - exp: "match(output.stdout, /Hello, World!/g)"
             onFailure: 
               - "download-failed-job"
+      - "deleteJobOutput" 
+  exec-rexx-until:
+    desc: "Run an inline REXX program in batch that sleeps"
+    actions:
+      - name: "catREXXProgram"
+        desc: "Get the REXX program to include in the JOB"
+        action:
+          type: "exec"
+          run: "cat ${rexxSleepPath}"
+        jsonExtractor:
+          rexxPgm: "$.stdout"
+      - name: "renderREXXJob" 
+        desc: "Render REXX job"
+        action: 
+          type: "func"
+          run: "renderTemplate"
+        outputExtractor:
+          - var: "rexxJCL"
+        args:
+          templatePath: templates/inlineREXX.jcl
+          data: 
+            rexxexec: ${extracted.rexxPgm}
+            jobname: ${tsoUserID}R
+            account: ${accountInfo}
+      - name: "submitREXXJob"
+        desc: "Submit the rendered REXX Job"
+        action: 
+          type: "func"
+          run: "submitJob"
+        jsonExtractor: 
+          jobid: "$.jobid"
+          jobname: "$.jobname"
+        mergeArgs:
+          - zosmfArgs
+        args:
+          jcl: ${extracted.rexxJCL}     
+      - "waitForStatusActive"
+      - name: "checkForMessage"
+        desc: "Check for a message in the job output"
+        repeat:
+          untilValidatorsPass: true
+        action:
+          type: "cmd"
+          run: "jobs view sfbi"
+        args:
+          jobid: ${extracted.jobid}
+          spoolfileid: 103
+        validators:
+          - exp: "match(output.stdout, /Hello, World! 2/g)"
       - "deleteJobOutput" 
   #----------------------------------------------------------------------------#
   # Task: get-ipl-volume                                                       #
@@ -441,6 +490,19 @@ helpers:
         jobid: ${extracted.jobid}
         jobname: ${extracted.jobname}
         status: "OUTPUT"
+        # watchDelay: number
+        # attempts: number
+    - name: "waitForStatusActive"
+      desc: "Wait for JOB ${extracted.jobname}(${extracted.jobid}) status to be ACTIVE"
+      action:
+        type: "func"
+        run: "waitForJobStatus"
+      mergeArgs:
+        - zosmfArgs
+      args: 
+        jobid: ${extracted.jobid}
+        jobname: ${extracted.jobname}
+        status: "ACTIVE"
         # watchDelay: number
         # attempts: number
     - name: "validateJobCC"
