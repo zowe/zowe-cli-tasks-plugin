@@ -22,7 +22,7 @@ import ZoweTasksException from "./exception/ZoweTasksException";
 const chokidar = require("chokidar");
 import * as nodepath from "path";
 import Utils from "./Utils";
-const Spinner = require("cli-spinner").Spinner;
+const ora = require("ora");
 
 export default class Task extends BaseRunner {
     public static async run(params: IRunTask) {
@@ -127,11 +127,10 @@ export default class Task extends BaseRunner {
             // That might run during the async task block
             // TODO: There is probably a better way to handle this besides
             // TODO: globally silencing the tasks.
-            const spinner = new Spinner({
-                text: this.msgIndent + `   %s   Running Tasks "${names.toString()}"`,
-                stream: process.stderr
+            const spinner = ora({
+                text: `  Running Tasks "${names.toString()}"`,
+                prefixText: this.msgIndent + "  "
             });
-            spinner.setSpinnerString("|/-\\");
             spinner.start();
             this.console.silent = true;
 
@@ -151,7 +150,7 @@ export default class Task extends BaseRunner {
 
             // Await all promises and handle all results
             const results = await Promise.all(promises.map((p) => p.catch((e) => e)));
-            spinner.stop(true);
+            spinner.stop();
             this.console.silent = false;
             let err: boolean = false;
             for (const result of results) {
@@ -340,10 +339,6 @@ export default class Task extends BaseRunner {
      */
     private logTaskStart() {
         this.console.log(this.msgIndent + this.msgPrefix + `Task - ${this.name} - "${this.task.desc}"`);
-    }
-
-    private constructTaskStartMsg(indent: string, task: INamedTask): string {
-        return `${indent}Task - ${task.name} - "${task.task.desc}"`;
     }
 
     /**
