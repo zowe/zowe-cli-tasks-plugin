@@ -117,7 +117,6 @@
   "dependencies": {
     "chalk": "^2.4.2",
     "chokidar": "^3.2.1",
-    "cli-spinner": "^0.2.10",
     "glob": "^7.1.4",
     "handlebars": "^4.4.2",
     "js-yaml": "^3.13.1",
