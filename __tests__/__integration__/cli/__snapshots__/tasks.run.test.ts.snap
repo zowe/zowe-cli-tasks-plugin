@@ -1,5 +1,13 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`run tasks command should be able to repeat an action until the validators mark it valid 1`] = `
+"
+Task - repeat-until - \\"repeat the action until the validators mark it valid\\"
+   ✔   Action (getFutureTime) \\"get a time in the future\\"
+   ✔   Action (checkCurrentTime) \\"check if the current time is beyond the future time\\"
+"
+`;
+
 exports[`run tasks command should be able to run a CLI command 1`] = `
 "
 Task - run-zowe-cli - \\"Run a Zowe CLI command\\"

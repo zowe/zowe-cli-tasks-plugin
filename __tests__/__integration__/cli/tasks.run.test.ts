@@ -73,4 +73,24 @@ describe("run tasks command", () => {
         expect(output.stderr.toString()).toContain("The action in progress was \"execCommand\".");
         expect(output.status).toBe(1);
     });
+
+    it("should be able to repeat an action until the validators mark it valid", () => {
+        const yml = path.join(TEST_ENVIRONMENT.workingDir, "zowe-tasks-repeat-until.yml");
+        fs.copyFileSync(path.join(__dirname, "__yaml__", "zowe-tasks-repeat-until.yml"), yml);
+        const output = runCliScript(path.join(__dirname, "__scripts__", "zowe-tasks-run-cli.sh"),
+            TEST_ENVIRONMENT, [yml]);
+        expect(output.stdout.toString()).toMatchSnapshot();
+        expect(output.status).toBe(0);
+        const dateTimeDir = dirs(path.join(TEST_ENVIRONMENT.workingDir, "zowe-tasks-out-repeat-until"));
+        const outputLogPath = path.join(TEST_ENVIRONMENT.workingDir,
+            "zowe-tasks-out-repeat-until",
+            dateTimeDir[0],
+            "task_sequence_1_repeat-until",
+            "action_sequence_5_checkCurrentTime");
+        const repeatDirs = dirs(outputLogPath);
+        for (const dir of repeatDirs) {
+            expect(dir).toContain("checkCurrentTime");
+        }
+        expect(repeatDirs.length).toBeGreaterThan(5);
+    });
 });

@@ -1,0 +1,26 @@
+outputDir: "zowe-tasks-out-repeat-until"
+
+tasks: 
+  repeat-until:
+    desc: "repeat the action until the validators mark it valid"
+    actions:
+      - name: "getFutureTime"
+        desc: "get a time in the future"
+        action:
+          type: "js"
+          run: >
+            return new Date().getTime() + 15000;
+        outputExtractor:
+          - var: "currentTimeMS"
+      - name: "checkCurrentTime"
+        desc: "check if the current time is beyond the future time"
+        repeat:
+          untilValidatorsPass: true
+        action:
+          type: "js"
+          run: >
+            return (new Date().getTime() > futureTime);
+        validators:
+          - exp: "output === true"
+        args:
+          futureTime: ${extracted.currentTimeMS}
