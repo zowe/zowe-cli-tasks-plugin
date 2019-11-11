@@ -82,7 +82,7 @@ export default class Utils {
                 // If the value is non-null/undefined substitute the value
                 // either into the string OR directly to the property itself.
                 if (value != null) {
-                    if (typeof value === "string") {
+                    if (typeof object[property] === "string") {
                         object[property] = object[property].replace(`\$\{${propertyPrefix}${propName}\}`, value);
                     } else {
                         object[property] = value;
