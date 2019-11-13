@@ -60,7 +60,7 @@ export default class Action extends BaseRunner {
             // For each spawns the action for each of the items in the array
             // supplied and passes the items as extracted variables
             if (params.action.repeat.forEach != null) {
-                for (const fe of params.action.repeat.forEach) {
+                for (const fe of action.action.repeat.forEach) {
                     const actn = { ...action.action };
                     const extracted = { ...action.extractedOutput, ...fe };
                     delete actn.repeat;
