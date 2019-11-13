@@ -19,5 +19,6 @@ exports[`run tasks command should be able to substitute values from ENV and glob
 "
 Task - substitution - \\"var1: Var 1 Value var2: Var 2 Value var3: Var 3 Value\\"
    ✔   Action (Run some javascript) \\"Var 1 ValueVar 2 ValueVar 3 Value\\"
+   ✔   Action (Extract a numeric value into a string) \\"Var 3 Value 42\\"
 "
 `;
