@@ -1,0 +1,53 @@
+outputDir: "zowe-tasks-out-repeat-foreach"
+
+global:
+  ubuntuReleases:
+    - adjective: artful
+      animal: aardvark
+    - adjective: bionic
+      animal: beaver
+    - adjective: cosmic
+      animal: cuttlefish
+    - adjective: disco
+      animal: dingo
+    - adjective: eoan
+      animal: ermine
+
+tasks:
+  repeat-foreach:
+    desc: "repeat the action until the validators mark it valid"
+    actions:
+      - name: "printUbuntuAnimals"
+        desc: "print animal for Ubuntu release: ${extracted.adjective}"
+        repeat:
+          forEach: ${ubuntuReleases}
+        action:
+          type: "js"
+          run: >
+            console.log(animal);
+        args:
+          animal: ${extracted.animal}
+      - name: "numberUbuntuReleases"
+        desc: "calculate major number for each Ubuntu release"
+        action:
+          type: "js"
+          run: >
+            return ubuntuReleases.map((ur, i) => {
+              return { ...ur, majorNum: Math.floor(i / 2 + 17.5) };
+            });
+        args:
+          ubuntuReleases: ${ubuntuReleases}
+        outputExtractor:
+          - var: "numberedUbuntuReleases"
+      - name: "checkForEachExtracted"
+        desc: "check that variables get resolved in repeat.forEach (${extracted.adjective})"
+        repeat:
+          forEach: ${extracted.numberedUbuntuReleases}
+        action:
+          type: "js"
+          run: >
+            if (typeof majorNum !== "number" || majorNum < 17) {
+              throw new Error("repeat.forEach did NOT work!")
+            }
+        args:
+          majorNum: ${extracted.majorNum}

@@ -93,4 +93,13 @@ describe("run tasks command", () => {
         }
         expect(repeatDirs.length).toBeGreaterThan(5);
     });
+
+    it("should be able to repeat an action over an iterable with forEach", () => {
+        const yml = path.join(TEST_ENVIRONMENT.workingDir, "zowe-tasks-repeat-foreach.yml");
+        fs.copyFileSync(path.join(__dirname, "__yaml__", "zowe-tasks-repeat-foreach.yml"), yml);
+        const output = runCliScript(path.join(__dirname, "__scripts__", "zowe-tasks-run-cli.sh"),
+            TEST_ENVIRONMENT, [yml]);
+        expect(output.stdout.toString()).toMatchSnapshot();
+        expect(output.status).toBe(0);
+    });
 });
