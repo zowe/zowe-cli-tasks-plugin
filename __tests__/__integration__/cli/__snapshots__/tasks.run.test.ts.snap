@@ -1,5 +1,27 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`run tasks command should be able to repeat an action over an iterable with forEach 1`] = `
+"
+Task - repeat-foreach - \\"repeat the action until the validators mark it valid\\"
+aardvark
+   ✔   Action (printUbuntuAnimals) \\"print animal for Ubuntu release: artful\\"
+beaver
+   ✔   Action (printUbuntuAnimals) \\"print animal for Ubuntu release: bionic\\"
+cuttlefish
+   ✔   Action (printUbuntuAnimals) \\"print animal for Ubuntu release: cosmic\\"
+dingo
+   ✔   Action (printUbuntuAnimals) \\"print animal for Ubuntu release: disco\\"
+ermine
+   ✔   Action (printUbuntuAnimals) \\"print animal for Ubuntu release: eoan\\"
+   ✔   Action (numberUbuntuReleases) \\"calculate major number for each Ubuntu release\\"
+   ✔   Action (checkForEachExtracted) \\"check that variables get resolved in repeat.forEach (artful)\\"
+   ✔   Action (checkForEachExtracted) \\"check that variables get resolved in repeat.forEach (bionic)\\"
+   ✔   Action (checkForEachExtracted) \\"check that variables get resolved in repeat.forEach (cosmic)\\"
+   ✔   Action (checkForEachExtracted) \\"check that variables get resolved in repeat.forEach (disco)\\"
+   ✔   Action (checkForEachExtracted) \\"check that variables get resolved in repeat.forEach (eoan)\\"
+"
+`;
+
 exports[`run tasks command should be able to repeat an action until the validators mark it valid 1`] = `
 "
 Task - repeat-until - \\"repeat the action until the validators mark it valid\\"
