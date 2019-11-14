@@ -12,50 +12,50 @@
 # Once a value has been located, no other sources are searched. You can use    #
 # the extracted variables throughout the config file with ${varname}.          #
 #------------------------------------------------------------------------------#
-input: 
-  zosmfHost: 
+input:
+  zosmfHost:
     desc: "Hostname for z/OSMF instance -"
     sources:
       - user
       - env
-      - prompt 
-  zosmfPort: 
+      - prompt
+  zosmfPort:
     desc: "The port for your z/OSMF instance -"
     sources:
       - user
       - env
-      - prompt 
-  tsoUserID: 
+      - prompt
+  tsoUserID:
     desc: "Your TSO user ID (valid for z/OSMF) -"
     sources:
       - user
       - env
-      - prompt 
-  tsoPassword: 
+      - prompt
+  tsoPassword:
     desc: "Your TSO password (valid for z/OSMF) -"
     mask: true
-    sources: 
+    sources:
       - user
       - env
-      - prompt  
+      - prompt
   ussDirectory:
     desc: "A USS directory where files can be uploaded -"
     sources:
       - user
       - env
-      - prompt  
+      - prompt
   accountInfo:
     desc: "Your job account info (surround in quotes if number) -"
     sources:
       - user
       - env
-      - prompt      
+      - prompt
 
 #------------------------------------------------------------------------------#
 # Global lets you set variables that are global and static for your tasks.     #
 # You can use ${varname} throughout the config file to use these variables.    #
 #------------------------------------------------------------------------------#
-global: 
+global:
   rexxPath: ./samples/example.rexx
   rexxSleepPath: ./samples/exampleSleep.rexx
 #------------------------------------------------------------------------------#
@@ -63,15 +63,15 @@ global:
 # of arguments that are required on Zowe CLI commands. Instead of specifying   #
 # each argument by name, you can use "mergeArgs" to merge the arguments for    #
 # the action with a set of arguments defined here. Example:                    #
-#                                                                              # 
+#                                                                              #
 #   ...                                                                        #
-#   action:                                                                    # 
+#   action:                                                                    #
 #     type: "cmd"                                                              #
 #     run: "jobs submit lf"                                                    #
 #   mergeArgs:                                                                 #
 #     - zosmfArgs                                                              #
 #   args:                                                                      #
-#      localFile: rendered/iefbr14.jcl                                         # 
+#      localFile: rendered/iefbr14.jcl                                         #
 #   ...                                                                        #
 #                                                                              #
 #------------------------------------------------------------------------------#
@@ -82,25 +82,25 @@ args:
     user: ${tsoUserID}
     password: ${tsoPassword}
     rejectUnauthorized: false
-  hostSSH: 
+  hostSSH:
     port: 22
 
 #------------------------------------------------------------------------------#
-# Start of Tasks list - If "zowe tasks run" is issued without a task name,     # 
-# these tasks will run in the order they appear under "tasks" property.        # 
+# Start of Tasks list - If "zowe tasks run" is issued without a task name,     #
+# these tasks will run in the order they appear under "tasks" property.        #
 #------------------------------------------------------------------------------#
-tasks: 
+tasks:
 
   #----------------------------------------------------------------------------#
   # Task: render-job-file                                                      #
   #                                                                            #
   #       1. Renders a template from a file and saves it to a file             #
-  #       2. Rendered template is read and submitted for execution             # 
-  #       3. Waits for the job to complete                                     # 
+  #       2. Rendered template is read and submitted for execution             #
+  #       3. Waits for the job to complete                                     #
   #       4. Verifies the job completed with CC 0000                           #
   #       5. Validate that the job output contains the comment                 #
-  #       6. Deletes the output from spool                                     # 
-  #                                                                            # 
+  #       6. Deletes the output from spool                                     #
+  #                                                                            #
   #----------------------------------------------------------------------------#
   render-job-file:
     desc: "Render a job and submit the job"
@@ -113,7 +113,7 @@ tasks:
         args:
           templatePath: templates/iefbr14.jcl
           renderedPath: rendered/iefbr14.jcl
-          data: 
+          data:
             jobname: ${tsoUserID}I
             account: ${accountInfo}
       - name: "submitIefbr14Job"
@@ -125,7 +125,7 @@ tasks:
           - zosmfArgs
         args:
           localFile: rendered/iefbr14.jcl
-        jsonExtractor: 
+        jsonExtractor:
           jobid: "$.data.jobid"
           jobname: "$.data.jobname"
       - "waitForStatus"
@@ -135,38 +135,38 @@ tasks:
   # Task: render-job-inline                                                    #
   #                                                                            #
   #       1. Renders a template from a file and passes it on through a var     #
-  #       2. Rendered template is submitted for execution                      # 
-  #       3. Waits for the job to complete                                     # 
+  #       2. Rendered template is submitted for execution                      #
+  #       3. Waits for the job to complete                                     #
   #       4. Verifies the job completed with CC 0000                           #
   #       5. Validate that the job output contains the comment                 #
-  #       6. Deletes the output from spool                                     # 
-  #                                                                            # 
+  #       6. Deletes the output from spool                                     #
+  #                                                                            #
   #----------------------------------------------------------------------------#
   render-job-inline:
     desc: "Render a job and submit the job"
     actions:
       - name: "renderIefbr14Job"
         desc: "Render IEFBR14 job"
-        action: 
+        action:
           type: "func"
           run: "renderTemplate"
         outputExtractor:
           - var: "iefbr14JCL"
         args:
           templatePath: templates/iefbr14.jcl
-          data: 
+          data:
             jobname: ${tsoUserID}I
             account: ${accountInfo}
       - name: "submitIefbr14Job"
         desc: "Submit the rendered IEFBR14"
-        action: 
+        action:
           type: "func"
           run: "submitJob"
         mergeArgs:
           - zosmfArgs
         args:
           jcl: ${extracted.iefbr14JCL}
-        jsonExtractor: 
+        jsonExtractor:
           jobid: "$.jobid"
           jobname: "$.jobname"
       - "waitForStatus"
@@ -177,12 +177,12 @@ tasks:
   #                                                                            #
   #       1. Simple script creates a date/time comment                         #
   #       2. Comment is rendered into a job template                           #
-  #       3. Template is submitted for execution                               # 
-  #       4. Waits for the job to complete                                     # 
+  #       3. Template is submitted for execution                               #
+  #       4. Waits for the job to complete                                     #
   #       5. Verifies the job completed with CC 0000                           #
   #       6. Validate that the job output contains the comment                 #
-  #       7. Deletes the output from spool                                     # 
-  #                                                                            # 
+  #       7. Deletes the output from spool                                     #
+  #                                                                            #
   #----------------------------------------------------------------------------#
   render-job-inline-comment:
     desc: "Render a job and submit with date/time stamp"
@@ -198,23 +198,23 @@ tasks:
           - var: "dateTimeStamp"
       - name: "renderIefbr14Job"
         desc: "Render IEFBR14 job"
-        action: 
+        action:
           type: "func"
           run: "renderTemplate"
         outputExtractor:
           - var: "iefbr14JCL"
         args:
           templatePath: templates/iefbr14.jcl
-          data: 
+          data:
             jobname: ${tsoUserID}I
             account: ${accountInfo}
             comment: ${extracted.dateTimeStamp}
       - name: "submitIefbr14Job"
         desc: "Submit the rendered IEFBR14"
-        action: 
+        action:
           type: "func"
           run: "submitJob"
-        jsonExtractor: 
+        jsonExtractor:
           jobid: "$.jobid"
           jobname: "$.jobname"
         mergeArgs:
@@ -235,7 +235,7 @@ tasks:
           spoolfileid: 3
         validators:
           - exp: "match(output.stdout, /${extracted.dateTimeStamp}/g)"
-            onFailure: 
+            onFailure:
               - "download-failed-job"
       - "deleteJobOutput"
 
@@ -244,10 +244,10 @@ tasks:
   #                                                                            #
   #       1. Creates a directory on USS using "mkdir -p" shell command         #
   #       2. Uploads files to the directory                                    #
-  #       3. Changes the permissions to 755 with "chmod" shell command         # 
-  #       4. Issues an invalid shell command, but continues (successOnFail)    # 
+  #       3. Changes the permissions to 755 with "chmod" shell command         #
+  #       4. Issues an invalid shell command, but continues (successOnFail)    #
   #       5. Issues a simple "ls -la" shell command to verify it continued     #
-  #                                                                            # 
+  #                                                                            #
   #----------------------------------------------------------------------------#
   ssh-example:
     desc: "Create a directory and upload files"
@@ -261,11 +261,11 @@ tasks:
         mergeArgs:
           - hostSSH
           - zosmfArgs
-        args: 
+        args:
           command: "mkdir -p ${ussDirectory}"
       - name: "uploadFilesToUSS"
         desc: "Upload files to ${ussDirectory}"
-        action: 
+        action:
           type: "func"
           run: "uploadDirToUSS"
         mergeArgs:
@@ -281,7 +281,7 @@ tasks:
         mergeArgs:
           - hostSSH
           - zosmfArgs
-        args: 
+        args:
           command: "chmod -R 755 ${ussDirectory}"
       - name: "issueANonExistentCommand"
         desc: "Issue a command that doesn't exist and succeed"
@@ -293,7 +293,7 @@ tasks:
         mergeArgs:
           - hostSSH
           - zosmfArgs
-        args: 
+        args:
           command: "thiscommandisinvalid"
       - name: "commandAfterSuccessOnFail"
         desc: "Issue a command after success on Fail"
@@ -303,7 +303,7 @@ tasks:
         mergeArgs:
           - hostSSH
           - zosmfArgs
-        args: 
+        args:
           command: "ls -la"
 
   #----------------------------------------------------------------------------#
@@ -312,11 +312,11 @@ tasks:
   #       1. Issues a local host command "cat" to get the contents of a file   #
   #          (which are a REXX exec)                                           #
   #       2. Renders the REXX exec into a JOB that submits inline REXX         #
-  #       4. Waits for the job to complete                                     # 
+  #       4. Waits for the job to complete                                     #
   #       5. Verifies the job completed with CC 0000                           #
   #       6. Validates that the job outputted the "say" statements             #
-  #       7. Deletes the output from spool                                     # 
-  #                                                                            # 
+  #       7. Deletes the output from spool                                     #
+  #                                                                            #
   #----------------------------------------------------------------------------#
   exec-rexx:
     desc: "Run an inline REXX program in batch"
@@ -328,31 +328,31 @@ tasks:
           run: "cat ${rexxPath}"
         jsonExtractor:
           rexxPgm: "$.stdout"
-      - name: "renderREXXJob" 
+      - name: "renderREXXJob"
         desc: "Render REXX job"
-        action: 
+        action:
           type: "func"
           run: "renderTemplate"
         outputExtractor:
           - var: "rexxJCL"
         args:
           templatePath: templates/inlineREXX.jcl
-          data: 
+          data:
             rexxexec: ${extracted.rexxPgm}
             jobname: ${tsoUserID}R
             account: ${accountInfo}
       - name: "submitREXXJob"
         desc: "Submit the rendered REXX Job"
-        action: 
+        action:
           type: "func"
           run: "submitJob"
-        jsonExtractor: 
+        jsonExtractor:
           jobid: "$.jobid"
           jobname: "$.jobname"
         mergeArgs:
           - zosmfArgs
         args:
-          jcl: ${extracted.rexxJCL}     
+          jcl: ${extracted.rexxJCL}
       - "waitForStatus"
       - "validateJobCC"
       - name: "validateREXXOutput"
@@ -367,9 +367,9 @@ tasks:
           spoolfileid: 103
         validators:
           - exp: "match(output.stdout, /Hello, World!/g)"
-            onFailure: 
+            onFailure:
               - "download-failed-job"
-      - "deleteJobOutput" 
+      - "deleteJobOutput"
   exec-rexx-until:
     desc: "Run an inline REXX program in batch that sleeps"
     actions:
@@ -380,31 +380,31 @@ tasks:
           run: "cat ${rexxSleepPath}"
         jsonExtractor:
           rexxPgm: "$.stdout"
-      - name: "renderREXXJob" 
+      - name: "renderREXXJob"
         desc: "Render REXX job"
-        action: 
+        action:
           type: "func"
           run: "renderTemplate"
         outputExtractor:
           - var: "rexxJCL"
         args:
           templatePath: templates/inlineREXX.jcl
-          data: 
+          data:
             rexxexec: ${extracted.rexxPgm}
             jobname: ${tsoUserID}R
             account: ${accountInfo}
       - name: "submitREXXJob"
         desc: "Submit the rendered REXX Job"
-        action: 
+        action:
           type: "func"
           run: "submitJob"
-        jsonExtractor: 
+        jsonExtractor:
           jobid: "$.jobid"
           jobname: "$.jobname"
         mergeArgs:
           - zosmfArgs
         args:
-          jcl: ${extracted.rexxJCL}     
+          jcl: ${extracted.rexxJCL}
       - "waitForStatusActive"
       - name: "checkForMessage"
         desc: "Check for a message in the job output"
@@ -413,19 +413,21 @@ tasks:
         action:
           type: "cmd"
           run: "jobs view sfbi"
+        mergeArgs:
+          - zosmfArgs
         args:
           jobid: ${extracted.jobid}
           spoolfileid: 103
         validators:
           - exp: "match(output.stdout, /Hello, World! 2/g)"
-      - "deleteJobOutput" 
+      - "deleteJobOutput"
   #----------------------------------------------------------------------------#
   # Task: get-ipl-volume                                                       #
   #                                                                            #
   #       1. Issues an MVS "D IPLINFO" command                                 #
   #       2. Runs a script to extract the IPL volume                           #
   #       3. Write to a text file                                              #
-  #                                                                            # 
+  #                                                                            #
   #----------------------------------------------------------------------------#
   get-ipl-volume:
     desc: "Extract the IPL volume"
@@ -473,7 +475,7 @@ tasks:
 # referenced as reusable tasks/actions throughout your "tasks" stream. You can #
 # also run the tasks directly by specifying their name on the "run" command.   #
 #------------------------------------------------------------------------------#
-helpers: 
+helpers:
 
   #----------------------------------------------------------------------------#
   # Helper Actions                                                             #
@@ -486,7 +488,7 @@ helpers:
         run: "waitForJobStatus"
       mergeArgs:
         - zosmfArgs
-      args: 
+      args:
         jobid: ${extracted.jobid}
         jobname: ${extracted.jobname}
         status: "OUTPUT"
@@ -499,7 +501,7 @@ helpers:
         run: "waitForJobStatus"
       mergeArgs:
         - zosmfArgs
-      args: 
+      args:
         jobid: ${extracted.jobid}
         jobname: ${extracted.jobname}
         status: "ACTIVE"
@@ -510,14 +512,14 @@ helpers:
       action:
         type: "cmd"
         run: "jobs view jsbj"
-      validators: 
+      validators:
         - exp: "output.data.retcode === 'CC 0000'"
-          onFailure: 
+          onFailure:
             - "download-failed-job"
       mergeArgs:
         - zosmfArgs
       args:
-        jobid: ${extracted.jobid}    
+        jobid: ${extracted.jobid}
     - name: "deleteJobOutput"
       desc: "Delete the output of ${extracted.jobname}(${extracted.jobid})"
       action:
@@ -534,7 +536,7 @@ helpers:
         run: "waitForJobStatus"
       mergeArgs:
         - zosmfArgs
-      args: 
+      args:
         jobid: ${extracted.jobid}
         jobname: ${extracted.jobname}
         status: "OUTPUT"
@@ -546,13 +548,13 @@ helpers:
     #--------------------------------------------------------------------------#
     # Task: download-failed-job                                                #
     #                                                                          #
-    #       If a job fails, this task is invoked to download the job output    # 
+    #       If a job fails, this task is invoked to download the job output    #
     #       for review on the local filesystem.                                #
     #                                                                          #
     #--------------------------------------------------------------------------#
-    download-failed-job: 
+    download-failed-job:
       desc: "Download the failed job"
-      actions: 
+      actions:
         - name: "downloadFailedJob"
           desc: "Download the failed job"
           action:
@@ -570,9 +572,9 @@ helpers:
     #       Causes an SSH error, but continues with "successOnTrue"            #
     #                                                                          #
     #--------------------------------------------------------------------------#
-    ssh-error: 
+    ssh-error:
       desc: "Another SSH error"
-      actions: 
+      actions:
         - name: "anotherSSHError"
           desc: "Cause another SSH error"
           successOnFail: true
@@ -593,7 +595,7 @@ helpers:
     #--------------------------------------------------------------------------#
     ssh-echo:
       desc: "Simple SSH echo command"
-      actions: 
+      actions:
         - name: "doASimpleEcho"
           desc: "Simple Echo Hello World!"
           onSuccessMsg: "It worked!"
@@ -605,4 +607,3 @@ helpers:
             - zosmfArgs
           args:
             command: "echo 'Hello, World!'"
-          
