@@ -79,7 +79,7 @@ export default class Utils {
                 let propName: string = result[0].replace(`\$\{${propertyPrefix}`, "").replace(/}$/, "");
                 const hasDoubleBraces = propName.startsWith("{") && propName.endsWith("}");
                 if (hasDoubleBraces) {
-                    propName = propName.slice(1, propName.length - 1);
+                    propName = propName.slice(1, -1);
                 }
                 const value = lodash.get(substitutions, propName);
 
