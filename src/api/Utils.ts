@@ -69,23 +69,29 @@ export default class Utils {
             object[property] = str;
 
             // Regex is matching on ${<varname>}
-            const reg = /\${[^}]+}/g;
+            const reg = /\${[^}]+}}?/g;
             let result;
             // tslint:disable-next-line: no-conditional-assignment
             while ((result = reg.exec(str)) !== null) {
 
                 // Get the property name from the match and get the value for
                 // property from the substitution values.
-                const propName: string = result[0].replace(`\$\{${propertyPrefix}`, "").replace("}", "");
+                let propName: string = result[0].replace(`\$\{${propertyPrefix}`, "").replace(/}$/, "");
+                const hasDoubleBraces = propName.startsWith("{") && propName.endsWith("}");
+                if (hasDoubleBraces) {
+                    propName = propName.slice(1, propName.length - 1);
+                }
                 const value = lodash.get(substitutions, propName);
 
                 // If the value is non-null/undefined substitute the value
                 // either into the string OR directly to the property itself.
                 if (value != null) {
-                    if (typeof object[property] === "string") {
-                        object[property] = object[property].replace(`\$\{${propertyPrefix}${propName}\}`, value);
-                    } else {
+                    if (object[property] === result[0] && !hasDoubleBraces) {
                         object[property] = value;
+                    } else if (hasDoubleBraces) {
+                        object[property] = object[property].replace(`\$\{\{${propertyPrefix}${propName}\}\}`, value);
+                    } else {
+                        object[property] = object[property].replace(`\$\{${propertyPrefix}${propName}\}`, value);
                     }
                 }
             }
