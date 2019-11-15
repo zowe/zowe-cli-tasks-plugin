@@ -12,8 +12,10 @@ input:
 
 global:
   exampleVar3: "Var 3 Value"
+  numericVar: 42
+  booleanVar: true
 
-tasks: 
+tasks:
   substitution:
     desc: "var1: ${exampleVar1} var2: ${exampleVar2} var3: ${exampleVar3}"
     actions:
@@ -25,3 +27,43 @@ tasks:
             if ("${exampleVar1}" !== "Var 1 Value" || "${exampleVar2}" !== "Var 2 Value" || "${exampleVar3}" !== "Var 3 Value") {
               throw new Error("Substitution did NOT work!")
             }
+      - name: "Resolve a boolean value inside a string"
+        desc: "${booleanVar}"
+        action:
+          type: "js"
+          run: >
+            if (testStr !== "true") {
+              throw new Error("Substitution did NOT work!")
+            }
+        args:
+          testStr: ${{booleanVar}}
+      - name: "Resolve a boolean value not inside a string"
+        desc: "${booleanVar}"
+        action:
+          type: "js"
+          run: >
+            if (testBool !== true) {
+              throw new Error("Substitution did NOT work!")
+            }
+        args:
+          testBool: ${booleanVar}
+      - name: "Resolve a numeric value inside a string"
+        desc: "${numericVar}"
+        action:
+          type: "js"
+          run: >
+            if (testStr !== "42") {
+              throw new Error("Substitution did NOT work!")
+            }
+        args:
+          testStr: ${{numericVar}}
+      - name: "Resolve a numeric value not inside a string"
+        desc: "${numericVar}"
+        action:
+          type: "js"
+          run: >
+            if (testNum !== 42) {
+              throw new Error("Substitution did NOT work!")
+            }
+        args:
+          testNum: ${numericVar}

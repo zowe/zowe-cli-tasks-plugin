@@ -29,7 +29,7 @@
     "prepublishOnly": "npm run build",
     "lint": "tslint \"src/**/*.ts\"",
     "test": "npm run test:unit && npm run test:integration && npm run test:system",
-    "test:system": "env-cmd __tests__/__resources__/env/system.env jest .*/__system__/.* --coverage false",
+    "test:system": "cd example && zowe tasks run --log-output",
     "test:integration": "env-cmd __tests__/__resources__/env/integration.env jest .*/__integration__/.* --coverage false",
     "test:unit": "env-cmd __tests__/__resources__/env/unit.env jest --coverage --testPathIgnorePatterns \".*/__system__|__integration__/.*\"",
     "installPlugin": "npm install && npm run clean && npm run build && zowe plugins install ."
@@ -118,7 +118,7 @@
     "chalk": "^2.4.2",
     "chokidar": "^3.2.1",
     "glob": "^7.1.4",
-    "handlebars": "^4.5.1",
+    "handlebars": "^4.5.2",
     "js-yaml": "^3.13.1",
     "jsonpath": "^1.0.2",
     "lodash": "^4.17.15",
