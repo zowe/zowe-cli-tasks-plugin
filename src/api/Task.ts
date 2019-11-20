@@ -22,6 +22,7 @@ import ZoweTasksException from "./exception/ZoweTasksException";
 const chokidar = require("chokidar");
 import * as nodepath from "path";
 import Utils from "./Utils";
+import { isArray } from "util";
 const ora = require("ora");
 
 export default class Task extends BaseRunner {
@@ -33,7 +34,100 @@ export default class Task extends BaseRunner {
             task.extractedOutput = {};
         }
         Utils.traverse(task.task, task.extractedOutput, "extracted.");
-        await task.runTask();
+
+        // Check if repeat was requested for the task and verify that the
+        // value is a non-blank array.
+        if (task.task.repeat != null) {
+            if (task.task.repeat.forEach != null) {
+                if (isArray(task.task.repeat.forEach)) {
+
+                    // For each array entry, re-run this task (after) deleting
+                    // the repeat.
+                    const promises = [];
+
+                    // If async, silence the tasks
+                    let spinner;
+                    if (task.task.async != null) {
+                        task.logTaskStart();
+                        spinner = ora({
+                            text: `  Running Async "for each" task "${task.name}"`,
+                            prefixText: task.msgIndent + "  "
+                        });
+                        spinner.start();
+                        spinner.render();
+                        task.console.silent = true;
+                    }
+
+                    for (const fe of task.task.repeat.forEach) {
+
+                        // Copy the task an form the extracted vars, then
+                        // remote repeat and async to prevent recursion.
+                        const tsk = { ...task.task };
+                        const extracted = { ...task.extractedOutput, ...fe };
+                        delete tsk.repeat;
+                        delete tsk.async;
+
+                        // Construct the parameters.
+                        const tskParms: IRunTask = {
+                            task: tsk,
+                            name: params.name,
+                            logDir: task.logDir,
+                            extracted,
+                            console: task.console,
+                            config: task.config,
+                            logOutput: task.logOutput,
+                            msgIndent: task.msgIndent
+                        };
+
+                        if (task.task.async) {
+                            promises.push(Task.run(tskParms));
+                        } else {
+                            await Task.run(tskParms);
+                        }
+                    }
+
+                    // If promises were queued, wait for the result
+                    if (promises.length > 0) {
+                        // Await all promises
+                        const results = await Promise.all(promises.map((p) => p.catch((e) => e)));
+
+                        // Stop the spinner and un-silence
+                        spinner.stop();
+                        task.console.silent = false;
+
+                        // Process any error messages
+                        let err: boolean = false;
+                        for (const result of results) {
+                            if (result instanceof Error) {
+                                // First error, issue the failed task message
+                                if (!err) {
+                                    task.console.log(task.msgIndent + `   \u2716   Running Async "for each" task "${task.name}"`);
+                                }
+
+                                // Log the task failure and indicate error for surfacing.
+                                task.logTaskFailed(result.message);
+                                err = true;
+                            }
+                        }
+
+                        // surface the error
+                        if (err) {
+                            throw new TaskException(`Async task set failed.`);
+                        }
+
+                        task.console.log(task.msgIndent + `   \u2714   Running Async "for each" task "${task.name}"`);
+                    }
+
+
+                } else {
+                    throw new TaskException(`"repeat.forEach" was specified, but the value is not an array.`);
+                }
+            } else {
+                throw new TaskException(`"repeat" was specified, but did not contain "forEach".`);
+            }
+        } else {
+            await task.runTask();
+        }
     }
 
     protected name: string;

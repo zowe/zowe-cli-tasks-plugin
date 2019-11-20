@@ -1,0 +1,30 @@
+global:
+  myList:
+    - value: 1
+    - value: 2
+    - value: 3
+
+tasks:
+  for-each:
+    desc: "Perform this task for each of the values in 'myList'"
+    repeat:
+      forEach: ${myList}
+    actions:
+      - name: "increment the value"
+        desc: "Increment by 1"
+        action:
+          type: "js"
+          run: >
+            return ${extracted.value} + 1;
+        outputExtractor:
+          - var: "theIncrement"
+      - name: "validateValue"
+        desc: "Validate the increment (${extracted.theIncrement})"
+        action:
+          type: "js"
+          run: >
+            if (${extracted.value} + 1 === ${extracted.theIncrement}) {
+              return;
+            } else {
+              throw new Error("The value did not increase!");
+            }

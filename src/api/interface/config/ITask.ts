@@ -12,6 +12,7 @@
 import { IAction } from "./IAction";
 import { IWatch } from "./IWatch";
 import { INamedTask } from "../task/INamedTask";
+import { ITaskRepeat } from "./ITaskRepeat";
 
 export interface ITask {
     desc: string;
@@ -19,4 +20,5 @@ export interface ITask {
     watch?: IWatch;
     tasks?: INamedTask[] | string[];
     async?: boolean;
+    repeat?: ITaskRepeat;
 }

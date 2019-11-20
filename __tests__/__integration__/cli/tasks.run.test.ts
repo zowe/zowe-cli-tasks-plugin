@@ -102,4 +102,32 @@ describe("run tasks command", () => {
         expect(output.stdout.toString()).toMatchSnapshot();
         expect(output.status).toBe(0);
     });
+
+    it("should be able to repeat a task over an iterable with forEach", () => {
+        const yml = path.join(TEST_ENVIRONMENT.workingDir, "zowe-tasks-task-for-each.yml");
+        fs.copyFileSync(path.join(__dirname, "__yaml__", "zowe-tasks-task-for-each.yml"), yml);
+        const output = runCliScript(path.join(__dirname, "__scripts__", "zowe-tasks-run-cli.sh"),
+            TEST_ENVIRONMENT, [yml]);
+        expect(output.stdout.toString()).toMatchSnapshot();
+        expect(output.status).toBe(0);
+    });
+
+    it("should be able to repeat a task over an iterable with forEach async", () => {
+        const yml = path.join(TEST_ENVIRONMENT.workingDir, "zowe-tasks-task-for-each-async.yml");
+        fs.copyFileSync(path.join(__dirname, "__yaml__", "zowe-tasks-task-for-each-async.yml"), yml);
+        const output = runCliScript(path.join(__dirname, "__scripts__", "zowe-tasks-run-cli.sh"),
+            TEST_ENVIRONMENT, [yml]);
+        expect(output.stdout.toString()).toMatchSnapshot();
+        expect(output.status).toBe(0);
+    });
+
+    it("should be able to repeat a task over an iterable with forEach async and print failures", () => {
+        const yml = path.join(TEST_ENVIRONMENT.workingDir, "zowe-tasks-task-for-each-async-failure.yml");
+        fs.copyFileSync(path.join(__dirname, "__yaml__", "zowe-tasks-task-for-each-async-failure.yml"), yml);
+        const output = runCliScript(path.join(__dirname, "__scripts__", "zowe-tasks-run-cli.sh"),
+            TEST_ENVIRONMENT, [yml]);
+        expect(output.stdout.toString()).toMatchSnapshot();
+        expect(output.stderr.toString()).toMatchSnapshot();
+        expect(output.status).toBe(1);
+    });
 });
