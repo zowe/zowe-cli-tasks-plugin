@@ -127,7 +127,9 @@ describe("run tasks command", () => {
         const output = runCliScript(path.join(__dirname, "__scripts__", "zowe-tasks-run-cli.sh"),
             TEST_ENVIRONMENT, [yml]);
         expect(output.stdout.toString()).toMatchSnapshot();
-        expect(output.stderr.toString()).toMatchSnapshot();
+        const count = (output.stderr.toString().match(/\(Perform this task for each of the values in 'myList' async\) Failed/g) || []).length;
+        // tslint:disable-next-line: no-magic-numbers
+        expect(count).toBe(3);
         expect(output.status).toBe(1);
     });
 });

@@ -28,23 +28,6 @@ Task - for-each - \\"Perform this task for each of the values in 'myList' async\
 "
 `;
 
-exports[`run tasks command should be able to repeat a task over an iterable with forEach async and print failures 2`] = `
-"-   Running Async \\"for each\\" task \\"for-each\\"
-   -   Running Async \\"for each\\" task \\"for-each\\"
-Task \\"for-each\\" (Perform this task for each of the values in 'myList' async) Failed:
-   Async js function error callback invoked: The value did not increase!
-   The action in progress was \\"validateValue\\".
-
-Task \\"for-each\\" (Perform this task for each of the values in 'myList' async) Failed:
-   Async js function error callback invoked: The value did not increase!
-   The action in progress was \\"validateValue\\".
-
-Task \\"for-each\\" (Perform this task for each of the values in 'myList' async) Failed:
-   Async js function error callback invoked: The value did not increase!
-   The action in progress was \\"validateValue\\".
-"
-`;
-
 exports[`run tasks command should be able to repeat an action over an iterable with forEach 1`] = `
 "
 Task - repeat-foreach - \\"repeat the action until the validators mark it valid\\"
