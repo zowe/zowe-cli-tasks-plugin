@@ -161,7 +161,7 @@ export default class Config {
         // Create a mutable stdout
         const mutableStdout: any = new Writable({
             write(chunk, encoding, callback) {
-                if (!this.muted) {
+                if (!(this as any).muted) {
                     process.stdout.write(chunk, encoding);
                 }
                 callback();
