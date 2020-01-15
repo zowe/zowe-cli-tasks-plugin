@@ -16,3 +16,4 @@ failed_job_output/
 rendered/
 iplvol.txt
 npm-shrinkwrap.json
+package-lock.json
