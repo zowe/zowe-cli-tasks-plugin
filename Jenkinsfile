@@ -32,6 +32,7 @@ node('ca-jenkins-agent') {
 
     // Protected branch property definitions
     pipeline.protectedBranches.addMap([
+        [name: "publish2-0.2.2", tag: "delete-me"],
         [name: "master", tag: "latest", dependencies: ["@zowe/imperative": "latest"]],
         [name: "lts-incremental", tag: "lts-incremental", dependencies: ["@brightside/imperative": "lts-incremental"]]
     ])
