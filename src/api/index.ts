@@ -10,12 +10,12 @@
 */
 
 // Module exports
-export * from "./Action";
-export * from "./Tasks";
-export * from "./Task";
-export * from "./RunConsole";
-export * from "./Config";
-export * from "./ActionValidator";
+export { default as Action } from "./Action";
+export { default as Tasks } from "./Tasks";
+export { default as Task } from "./Task";
+export { default as RunConsole } from "./RunConsole";
+export { default as Config } from "./Config";
+export { default as ActionValidator } from "./ActionValidator";
 
 // Config interface exports
 export * from "./interface/config/IAction";
@@ -59,13 +59,13 @@ export * from "./interface/script/IScript";
 export * from "./interface/script/IScriptParameters";
 
 // Exception exports
-export * from "./exception/ActionException";
-export * from "./exception/ActionInputException";
-export * from "./exception/ActionRunException";
-export * from "./exception/ActionValidatorException";
-export * from "./exception/ActionValidatorUnexpectedException";
-export * from "./exception/ConfigException";
-export * from "./exception/FuncException";
-export * from "./exception/InputException";
-export * from "./exception/TaskException";
-export * from "./exception/ZoweTasksException";
+export { default as ActionException } from "./exception/ActionException";
+export { default as ActionInputException } from "./exception/ActionInputException";
+export { default as ActionRunException } from "./exception/ActionRunException";
+export { default as ActionValidatorException } from "./exception/ActionValidatorException";
+export { default as ActionValidatorUnexpectedException } from "./exception/ActionValidatorUnexpectedException";
+export { default as ConfigException } from "./exception/ConfigException";
+export { default as FuncException } from "./exception/FuncException";
+export { default as InputException } from "./exception/InputException";
+export { default as TaskException } from "./exception/TaskException";
+export { default as ZoweTasksException } from "./exception/ZoweTasksException";
