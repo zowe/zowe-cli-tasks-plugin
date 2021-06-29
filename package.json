@@ -1,6 +1,6 @@
 {
   "name": "@zowe/tasks-for-zowe-cli",
-  "version": "0.2.4",
+  "version": "0.3.0-next-20210629182300",
   "description": "Zowe CLI Tasks Plugin",
   "publishConfig": {
     "registry": "https://zowe.jfrog.io/zowe/api/npm/npm-local-release/"
@@ -111,8 +111,8 @@
     ]
   },
   "peerDependencies": {
-    "@zowe/cli": "^6.0.0",
-    "@zowe/imperative": "^4.0.0"
+    "@zowe/cli": ">=7.0.0-next.202106242030 <7.0.0",
+    "@zowe/imperative": ">=5.0.0-next.202106221817 <5.0.0"
   },
   "dependencies": {
     "chalk": "2.4.2",
@@ -131,8 +131,8 @@
     "@types/jest": "^22.2.3",
     "@types/node": "^12.12.24",
     "@types/yargs": "^15.0.0",
-    "@zowe/cli": "^6.6.2",
-    "@zowe/imperative": "4.8.0",
+    "@zowe/cli": ">=7.0.0-next <8.0.0",
+    "@zowe/imperative": ">=5.0.0-next <6.0.0",
     "env-cmd": "^8.0.2",
     "fs-extra": "^8.1.0",
     "jest": "^24.3.1",
