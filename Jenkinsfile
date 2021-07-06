@@ -19,9 +19,9 @@ import org.zowe.pipelines.nodejs.models.SemverLevel
  */
 def PRODUCT_NAME = "Zowe CLI"
 
-node('ca-jenkins-agent') {
+node('zowe-jenkins-agent') {
     // Initialize the pipeline
-    def pipeline = new NodeJSPipeline(this)
+    def pipeline = new NodeJSPipeline(nodeJsVersion: 'v12.22.1')
 
     // Build admins, users that can approve the build and receieve emails for
     // all protected branch builds.
@@ -33,6 +33,7 @@ node('ca-jenkins-agent') {
     // Protected branch property definitions
     pipeline.protectedBranches.addMap([
         [name: "master", tag: "latest", dependencies: ["@zowe/imperative": "latest"]],
+        [name: "next", tag: "next", prerelease: "next"],
         [name: "lts-incremental", tag: "lts-incremental", dependencies: ["@brightside/imperative": "lts-incremental"]]
     ])
 
@@ -113,10 +114,10 @@ node('ca-jenkins-agent') {
         testResults: [dir: "${INTEGRATION_TEST_ROOT}/jest-stare", files: "index.html", name: "${PRODUCT_NAME} - Integration Test Report"],
         junitOutput: INTEGRATION_JUNIT_OUTPUT,
     )
-    
+
     // Check for vulnerabilities
     pipeline.checkVulnerabilities()
-    
+
     // Deploys the application if on a protected branch. Give the version input
     // 30 minutes before an auto timeout approve.
     pipeline.deploy(
