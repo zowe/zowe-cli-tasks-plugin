@@ -141,11 +141,8 @@ node('zowe-jenkins-agent') {
         ]
     )
 
-    // Deploys the application if on a protected branch. Give the version input
-    // 30 minutes before an auto timeout approve.
-    pipeline.deploy(
-        versionArguments: [timeout: [time: 30, unit: 'MINUTES']]
-    )
+    // Deploys the application if on a protected branch.
+    pipeline.deploy()
 
     // Once called, no stages can be added and all added stages will be executed. On completion
     // appropriate emails will be sent out by the shared library.
