@@ -228,7 +228,7 @@ export default class Task extends BaseRunner {
     private async runWatch(watch: IWatch) {
         // Establish the watcher
         const watcher = chokidar.watch(watch.glob, {
-            ignored: /(^|[\/\\])\../, // ignore dotfiles
+            ignored: /(^|[/\\])\../, // ignore dotfiles
             persistent: true,
             ignoreInitial: true
         });
