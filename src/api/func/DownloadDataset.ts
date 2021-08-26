@@ -12,8 +12,7 @@
 import { IFuncParameters } from "../interface/func/IFuncParameters";
 import { Session } from "@zowe/imperative";
 import BaseZosmfFunc from "./BaseZosmfFunc";
-import { List, IZosFilesResponse, Download } from "@zowe/cli";
-import * as path from "path";
+import { Download } from "@zowe/cli";
 import FuncException from "../exception/FuncException";
 import { Dataset } from "../zosmf/Dataset";
 

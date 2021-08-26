@@ -190,7 +190,7 @@ export default class Config {
                     // If user was specified, check if the user config has the
                     // value specified and if so, break the loop. The value
                     // is filled in later during config loading.
-                    case "user":
+                    case "user": {
                         if (this.userConfig != null) {
                             const uc = this.userConfig[input];
                             if (uc != null) {
@@ -204,9 +204,10 @@ export default class Config {
                             }
                         }
                         break;
+                    }
 
                     // Prompt the user for the value
-                    case "prompt":
+                    case "prompt": {
                         const desc = `${(userIn.desc != null) ? `${userIn.desc}` : "Specify value for"}`;
                         const question = `${desc} "${input}"${(userIn.mask) ? " (masked)" : ""}: `;
                         const answer = await this.ask(rl, question, mutableStdout, userIn.mask || false);
@@ -221,15 +222,17 @@ export default class Config {
                             process.stdout.write("\n");
                         }
                         break;
+                    }
 
                     // Check the ENV var "ZOWE_TASKS_VAR_<varname>"
-                    case "env":
+                    case "env": {
                         value = this.processInputValue(process.env[`${Config.EnvPrefix}_${input.toUpperCase()}`], userIn);
                         if (value != null) {
                             loadedInputs[input] = value;
                             supplied = true;
                         }
                         break;
+                    }
                 }
 
                 // If the value was found, break from the loop

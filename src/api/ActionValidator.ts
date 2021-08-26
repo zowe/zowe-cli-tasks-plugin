@@ -39,7 +39,10 @@ export default class ActionValidator {
  * Utility function available to the "eval" expression.
  * @param str The string to check for a match.
  * @param regex The regular expression to match.
- */
-function match(str: string, regex: RegExp): boolean {
+ *
+ * Commented out this unused function
+ *
+match(str: string, regex: RegExp): boolean {
     return (str.match(regex)) ? true : false;
 }
+ */
