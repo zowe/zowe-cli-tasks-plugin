@@ -12,7 +12,7 @@
 import { IFuncParameters } from "../interface/func/IFuncParameters";
 import { Session } from "@zowe/imperative";
 import BaseZosmfFunc from "./BaseZosmfFunc";
-import { IJob, SubmitJobs, MonitorJobs, IMonitorJobWaitForParms } from "@zowe/cli";
+import { IJob, MonitorJobs, IMonitorJobWaitForParms } from "@zowe/cli";
 
 export default class WaitForJobStatus extends BaseZosmfFunc {
     protected async execZosmf(params: IFuncParameters, session: Session): Promise<any> {

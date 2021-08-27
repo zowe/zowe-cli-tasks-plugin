@@ -10,7 +10,7 @@
 */
 
 import { IFuncParameters } from "../interface/func/IFuncParameters";
-import { ImperativeError, Session } from "@zowe/imperative";
+import { ImperativeError } from "@zowe/imperative";
 import FuncException from "../exception/FuncException";
 import BaseFunc from "./BaseFunc";
 

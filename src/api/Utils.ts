@@ -76,7 +76,7 @@ export default class Utils {
 
                 // Get the property name from the match and get the value for
                 // property from the substitution values.
-                let propName: string = result[0].replace(`\$\{${propertyPrefix}`, "").replace(/}$/, "");
+                let propName: string = result[0].replace(`$\{${propertyPrefix}`, "").replace(/}$/, "");
                 const hasDoubleBraces = propName.startsWith("{") && propName.endsWith("}");
                 if (hasDoubleBraces) {
                     propName = propName.slice(1, -1);
@@ -89,9 +89,9 @@ export default class Utils {
                     if (object[property] === result[0] && !hasDoubleBraces) {
                         object[property] = value;
                     } else if (hasDoubleBraces) {
-                        object[property] = object[property].replace(`\$\{\{${propertyPrefix}${propName}\}\}`, value);
+                        object[property] = object[property].replace(`$\{{${propertyPrefix}${propName}}}`, value);
                     } else {
-                        object[property] = object[property].replace(`\$\{${propertyPrefix}${propName}\}`, value);
+                        object[property] = object[property].replace(`$\{${propertyPrefix}${propName}}`, value);
                     }
                 }
             }
