@@ -468,7 +468,6 @@ export default class Action extends BaseRunner {
         // Create the function
         let func;
         try {
-            // tslint:disable-next-line: function-constructor
             func = new Function(...argNames, this.action.action.run);
         } catch (err) {
             throw new ActionRunException(`Failed to create new js function:\n${err.message}`, this.action);
@@ -569,7 +568,6 @@ export default class Action extends BaseRunner {
             let cont: boolean = true;
             let func;
             try {
-                // tslint:disable-next-line: function-constructor
                 func = new Function(...argNames, this.action.action.run);
             } catch (err) {
                 cont = false;
@@ -579,7 +577,6 @@ export default class Action extends BaseRunner {
             // Create and call the function
             if (cont) {
                 try {
-                    // tslint:disable-next-line: function-constructor
                     func(...argValues);
                 } catch (err) {
                     reject(new ActionRunException(`Function threw an error:\n${err.message}`, this.action));

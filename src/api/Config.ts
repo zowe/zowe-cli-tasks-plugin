@@ -274,7 +274,6 @@ export default class Config {
                 } else if (!isNaN(parseInt(value, 10))) {
                     processedValue = parseInt(value, 10);
                 } else if (value === "true" || value === "false") {
-                    // tslint:disable-next-line: triple-equals
                     processedValue = (value == "true");
                 } else {
                     processedValue = value;

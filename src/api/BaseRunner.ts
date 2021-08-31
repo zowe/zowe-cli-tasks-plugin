@@ -74,7 +74,6 @@ export default abstract class BaseRunner {
     //     const reg = /\${\S+}/g;
     //     let str: string = object[property];
     //     let result;
-    //     // tslint:disable-next-line: no-conditional-assignment
     //     while ((result = reg.exec(str)) !== null) {
     //         for (const prop of Object.keys(this.extractedOutput)) {
     //             if (str.indexOf(`\$\{extracted.${prop}\}`) >= 0) {
