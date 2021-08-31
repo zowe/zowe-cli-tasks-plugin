@@ -26,7 +26,6 @@ export default class ActionValidator {
     public static evaluate(exp: string, output: any, action: IAction): boolean {
         let result;
         try {
-            // tslint:disable-next-line: no-eval
             result = eval(exp);
         } catch (err) {
             throw new ActionValidatorUnexpectedException(err.message, action);

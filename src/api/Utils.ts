@@ -24,7 +24,6 @@ export default class Utils {
     public static traverse(object: any, substitutions: any, propertyPrefix = "") {
         Object.keys(object).forEach((value) => {
             if (Array.isArray(object[value])) {
-                // tslint:disable-next-line: prefer-for-of
                 for (let x = 0; x < object[value].length; x++) {
                     if (typeof object[value][x] === "object") {
                         Utils.traverse(object[value][x], substitutions, propertyPrefix);
@@ -71,7 +70,6 @@ export default class Utils {
             // Regex is matching on ${<varname>}
             const reg = /\${[^}]+}}?/g;
             let result;
-            // tslint:disable-next-line: no-conditional-assignment
             while ((result = reg.exec(str)) !== null) {
 
                 // Get the property name from the match and get the value for
