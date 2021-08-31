@@ -2,7 +2,7 @@
 
 All notable changes to the Tasks Plug-in for Zowe CLI will be documented in this file.
 
-## `0.3.0-next.202108271415`
+## Recent Changes
 
 - Restored the match() function that was incorrectly removed.
 
