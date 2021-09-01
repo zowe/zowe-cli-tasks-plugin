@@ -26,7 +26,6 @@ export default class ActionValidator {
     public static evaluate(exp: string, output: any, action: IAction): boolean {
         let result;
         try {
-            // tslint:disable-next-line: no-eval
             result = eval(exp);
         } catch (err) {
             throw new ActionValidatorUnexpectedException(err.message, action);
@@ -40,9 +39,10 @@ export default class ActionValidator {
  * @param str The string to check for a match.
  * @param regex The regular expression to match.
  *
- * Commented out this unused function
- *
-match(str: string, regex: RegExp): boolean {
+ * This function appears to not be called, but it is
+ * used by the eval() function above.
+ */
+// eslint-disable-next-line unused-imports/no-unused-vars
+function match(str: string, regex: RegExp): boolean {
     return (str.match(regex)) ? true : false;
 }
- */

@@ -22,7 +22,6 @@ export default class ExecHandler implements ICommandHandler {
     public async process(params: IHandlerParameters): Promise<void> {
         const keyIter = Functions.BuiltIn.keys();
         let value;
-        // tslint:disable-next-line: no-conditional-assignment
         while ((value = keyIter.next().value) != null) {
             params.response.console.log(value);
         }
