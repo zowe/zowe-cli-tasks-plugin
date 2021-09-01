@@ -1,6 +1,6 @@
 {
   "name": "@zowe/tasks-for-zowe-cli",
-  "version": "0.3.0-next.202108271415",
+  "version": "0.3.0-next.202109011426",
   "description": "Zowe CLI Tasks Plugin",
   "publishConfig": {
     "registry": "https://zowe.jfrog.io/zowe/api/npm/npm-local-release/"
