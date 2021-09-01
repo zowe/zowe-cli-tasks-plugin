@@ -17,7 +17,6 @@ import { IJob, MonitorJobs, IMonitorJobWaitForParms } from "@zowe/cli";
 export default class WaitForJobStatus extends BaseZosmfFunc {
     protected async execZosmf(params: IFuncParameters, session: Session): Promise<any> {
         const response: IJob = await MonitorJobs.waitForStatusCommon(session as any,
-            // tslint:disable-next-line: no-object-literal-type-assertion
             { ...params.action.args } as IMonitorJobWaitForParms);
         return response;
     }
