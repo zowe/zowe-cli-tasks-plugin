@@ -41,5 +41,5 @@ export default abstract class BaseZosmfFunc extends BaseZoweFunc {
         return response;
     }
 
-    protected abstract async execZosmf(params: IFuncParameters, session: Session): Promise<any>;
+    protected abstract execZosmf(params: IFuncParameters, session: Session): Promise<any>;
 }

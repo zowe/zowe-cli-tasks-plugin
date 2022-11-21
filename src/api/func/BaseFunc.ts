@@ -22,5 +22,5 @@ export default abstract class BaseFunc implements IFunc {
         };
     }
 
-    protected abstract async exec(params: IFuncParameters): Promise<any>;
+    protected abstract exec(params: IFuncParameters): Promise<any>;
 }

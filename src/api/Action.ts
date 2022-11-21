@@ -299,7 +299,7 @@ export default class Action extends BaseRunner {
      * @param spinner The spinner to update the text
      */
     private runRepeatAction(maxRetries: number, interval: number, spinner: any): Promise<any> {
-        return new Promise<any>((resolve, reject) => {
+        return new Promise<void>((resolve, reject) => {
             this.retries++;
             const actn = { ...this.action };
             delete actn.repeat;

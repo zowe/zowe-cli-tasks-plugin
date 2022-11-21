@@ -33,5 +33,5 @@ export default abstract class BaseZoweFunc extends BaseFunc {
         return response;
     }
 
-    protected abstract async execZowe(params: IFuncParameters): Promise<any>;
+    protected abstract execZowe(params: IFuncParameters): Promise<any>;
 }
