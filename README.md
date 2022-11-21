@@ -1,23 +1,23 @@
 # Zowe CLI Tasks Plugin
-**Note:** This is a work in progress plugin and should be considered an alpha state. Functionality is subject to change.
+**Note:** This technology is a technical preview. It is not currently in active development. As a result, it is not currently supported by any team. Interested consumers can contact the Zowe Technical Steering Committee to either take ownership or to make a business case that this technology should be advanced into a generally available supported product.
 
-Installing: 
+Installing:
 ```
 zowe plugins install @zowe/tasks-for-zowe-cli
 ```
 
-Use cases: 
+Use cases:
 - Consolidate your Zowe build/script logic into a single Yaml file
 - Consolidate the input to your Zowe automation in a single file (no need for multiple profiles)
 - Quickly write automation using the power of Zowe CLI and it's plugins
-- Build common "workflow"-style tasks that can be shared and reused 
-- Speed up your automation by running tasks asynchronously and commands in a single process 
+- Build common "workflow"-style tasks that can be shared and reused
+- Speed up your automation by running tasks asynchronously and commands in a single process
 
-The Zowe CLI tasks plugin allows you to write sets of automation tasks in a Yaml config, similar to how you configure jobs and workflows using build tools like CircleCI, Drone, Travis, etc. 
+The Zowe CLI tasks plugin allows you to write sets of automation tasks in a Yaml config, similar to how you configure jobs and workflows using build tools like CircleCI, Drone, Travis, etc.
 
 For example, a common workflow might be:
 - Render a batch job from a template file for submission
-- Submit the batch job 
+- Submit the batch job
 - Wait for the job to complete
 - Verify that the Job finished CC 0000
 
@@ -33,7 +33,7 @@ You can now script these actions in Yaml. For example, here is submitting a job 
           - zosmfArgs
         args:
           localFile: rendered/iefbr14.jcl
-        jsonExtractor: 
+        jsonExtractor:
           jobid: "$.data.jobid"
           jobname: "$.data.jobname"
 ...
@@ -48,7 +48,7 @@ From a task's "action" you can run any of the following:
 
 Checkout a short [tutorial](./docs/starter.md) to learn about Zowe tasks and the yml configuration file.
 
-Checkout the [example](./example) directory for a more complete example. 
+Checkout the [example](./example) directory for a more complete example.
 
 For reference and in-depth information, checkout the [config](./docs/config.md) documentation.
 
